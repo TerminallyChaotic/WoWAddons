@@ -111,7 +111,6 @@ function IABD:TogglePanel()
     self.ui:HideAnchor()
   else
     self.settingsPanel:Show()
-    self.ui:ShowAnchor()
   end
 end
 
@@ -350,6 +349,36 @@ function IABD:CreateSettingsPanel()
   end)
   testBtn:SetScript("OnEnter", function() testTxt:SetTextColor(1, 0.5, 0) end)
   testBtn:SetScript("OnLeave", function() testTxt:SetTextColor(1, 1, 1) end)
+
+  -- Move Popup button (toggles draggable anchor)
+  local moveBtn = CreateFrame("Button", nil, panel)
+  moveBtn:SetPoint("LEFT", testBtn, "RIGHT", 10, 0)
+  moveBtn:SetSize(140, 26)
+  moveBtn:EnableMouse(true)
+  local moveBg = moveBtn:CreateTexture(nil, "BACKGROUND")
+  moveBg:SetAllPoints()
+  moveBg:SetColorTexture(0.15, 0.15, 0.15, 0.9)
+  local moveTxt = moveBtn:CreateFontString(nil, "OVERLAY")
+  moveTxt:SetPoint("CENTER")
+  moveTxt:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+  moveTxt:SetText("Move Popup")
+
+  local anchorVisible = false
+  moveBtn:SetScript("OnClick", function()
+    if anchorVisible then
+      IABD.ui:HideAnchor()
+      moveTxt:SetText("Move Popup")
+      moveBg:SetColorTexture(0.15, 0.15, 0.15, 0.9)
+      anchorVisible = false
+    else
+      IABD.ui:ShowAnchor()
+      moveTxt:SetText("Lock Position")
+      moveBg:SetColorTexture(1, 0.5, 0, 0.3)
+      anchorVisible = true
+    end
+  end)
+  moveBtn:SetScript("OnEnter", function() moveTxt:SetTextColor(1, 0.5, 0) end)
+  moveBtn:SetScript("OnLeave", function() moveTxt:SetTextColor(1, 1, 1) end)
 
   panel:Hide()
   self.settingsPanel = panel

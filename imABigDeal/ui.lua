@@ -12,47 +12,35 @@ function UI:CreatePortraitDot()
   if self.dot then return end
 
   local dot = CreateFrame("Frame", "ImABigDealDot", UIParent)
-  dot:SetSize(16, 16)
-  dot:SetFrameStrata("HIGH")
-  dot:SetPoint("TOPRIGHT", TargetFrame or UIParent, "TOPRIGHT", -4, -4)
+  dot:SetSize(20, 20)
+  dot:SetFrameStrata("TOOLTIP")  -- above everything
+  dot:SetFrameLevel(100)
 
-  local tex = dot:CreateTexture(nil, "OVERLAY")
+  -- Solid colored circle
+  local tex = dot:CreateTexture(nil, "ARTWORK")
   tex:SetAllPoints()
-  tex:SetTexture("Interface\\MINIMAP\\UI-Minimap-Background")
+  tex:SetColorTexture(1, 1, 1, 1)  -- colored per tier
   dot.texture = tex
 
-  -- Glow ring around the dot
+  -- Glow ring
   local glow = dot:CreateTexture(nil, "BACKGROUND")
   glow:SetPoint("CENTER")
-  glow:SetSize(24, 24)
-  glow:SetTexture("Interface\\MINIMAP\\UI-Minimap-Background")
-  glow:SetAlpha(0.3)
+  glow:SetSize(28, 28)
+  glow:SetColorTexture(1, 1, 1, 0.25)
   dot.glow = glow
+
+  -- Tier letter overlay (L, E, R, U, C)
+  local letter = dot:CreateFontString(nil, "OVERLAY")
+  letter:SetPoint("CENTER", 0, 0)
+  letter:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE, THICKOUTLINE")
+  letter:SetTextColor(0, 0, 0)
+  dot.letter = letter
 
   dot:Hide()
   self.dot = dot
 end
 
--- Find the target frame (12.0 may use different names)
-function UI:FindTargetFrame()
-  -- Try common target frame names across WoW versions
-  local candidates = {
-    TargetFrame,
-    _G["TargetFrame"],
-    _G["TargetUnitFrame"],
-    _G["CompactUnitFrame_Target"],
-  }
-  for _, frame in ipairs(candidates) do
-    if frame and frame.IsShown and frame:IsShown() then
-      return frame
-    end
-  end
-  -- Last resort: try to find any frame with "target" in its name
-  for _, frame in ipairs(candidates) do
-    if frame then return frame end
-  end
-  return nil
-end
+local tierLetters = { [5] = "L", [4] = "E", [3] = "R", [2] = "U", [1] = "C" }
 
 function UI:ShowDot(tier)
   if not self.dot then self:CreatePortraitDot() end
@@ -63,19 +51,32 @@ function UI:ShowDot(tier)
     return
   end
 
-  -- Find and anchor to the target portrait frame
-  local targetFrame = self:FindTargetFrame()
   self.dot:ClearAllPoints()
-  if targetFrame then
-    self.dot:SetPoint("TOPRIGHT", targetFrame, "TOPRIGHT", -4, -4)
-    self.dot:SetFrameLevel(targetFrame:GetFrameLevel() + 5)
-  else
-    -- Fallback: top-left area of screen where target frame usually is
-    self.dot:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 280, -20)
+
+  -- Try to anchor to the target frame (12.0 might use different names)
+  local anchored = false
+  local framesToTry = { "TargetFrame", "TargetUnitFrame" }
+  for _, fname in ipairs(framesToTry) do
+    local f = _G[fname]
+    if f and f.IsShown then
+      local ok = pcall(function()
+        self.dot:SetPoint("TOPRIGHT", f, "TOPRIGHT", 4, 4)
+      end)
+      if ok then
+        anchored = true
+        break
+      end
+    end
   end
 
-  self.dot.texture:SetVertexColor(color[1], color[2], color[3], 1)
-  self.dot.glow:SetVertexColor(color[1], color[2], color[3], 0.3)
+  -- Fallback: fixed position where target portrait usually sits
+  if not anchored then
+    self.dot:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 280, -16)
+  end
+
+  self.dot.texture:SetColorTexture(color[1], color[2], color[3], 1)
+  self.dot.glow:SetColorTexture(color[1], color[2], color[3], 0.25)
+  self.dot.letter:SetText(tierLetters[tier] or "?")
   self.dot:Show()
 end
 
