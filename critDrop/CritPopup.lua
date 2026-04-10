@@ -16,6 +16,7 @@ CP.settings = {
   abilitiesEnabled = true,
   dotsEnabled = true,
   critSoundId = 1,             -- index into sound list (1=LevelUp, 0=off)
+  soundMaxDuration = 1.0,      -- auto-cut sound after this many seconds (0=full length)
   -- Animation tuning
   bloomRadius = 80,            -- how far overlapping popups spread
   startHeight = 60,            -- drop start distance above landing point
@@ -213,12 +214,20 @@ function CP:OnDamageDetected(damageAmount, abilityType, indicator, unitTarget, s
   -- Guard against modules not loaded
   if not self.animations then return end
 
-  -- Play sound for crits
+  -- Play sound for crits (with auto-cutoff)
   if indicator == "CRITICAL" then
     local soundIdx = self.settings.critSoundId or 1
     local soundEntry = self.critSounds[soundIdx + 1]  -- 0-indexed setting, 1-indexed table
     if soundEntry and soundEntry.soundID then
-      PlaySound(soundEntry.soundID, "SFX")
+      local success, handle = PlaySound(soundEntry.soundID, "SFX")
+      if success and handle then
+        local maxDur = self.settings.soundMaxDuration or 1.0
+        if maxDur > 0 then
+          C_Timer.After(maxDur, function()
+            StopSound(handle, 0)
+          end)
+        end
+      end
     end
   end
 

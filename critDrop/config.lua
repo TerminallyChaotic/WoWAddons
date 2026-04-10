@@ -277,15 +277,59 @@ function Config:CreatePanel()
     Config:SaveSettings()
   end)
 
+  -- Stop button
+  local stopBtn = CreateFrame("Button", nil, panel)
+  stopBtn:SetPoint("LEFT", previewBtn, "RIGHT", 6, 0)
+  stopBtn:SetSize(45, 20)
+  stopBtn:EnableMouse(true)
+  local stopBg = stopBtn:CreateTexture(nil, "BACKGROUND")
+  stopBg:SetAllPoints()
+  stopBg:SetColorTexture(0.3, 0.1, 0.1, 0.9)
+  local stopTxt = stopBtn:CreateFontString(nil, "OVERLAY")
+  stopTxt:SetPoint("CENTER")
+  stopTxt:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+  stopTxt:SetText("Stop")
+
+  local lastSoundHandle = nil
+
   previewBtn:SetScript("OnClick", function()
     local idx = CP.settings.critSoundId or 1
     local entry = CP.critSounds[idx + 1]
     if entry and entry.soundID then
-      PlaySound(entry.soundID, "SFX")
+      -- Stop any previously playing preview
+      if lastSoundHandle then
+        StopSound(lastSoundHandle, 0)
+      end
+      local success, handle = PlaySound(entry.soundID, "SFX")
+      if success and handle then
+        lastSoundHandle = handle
+        -- Apply max duration cutoff to preview too
+        local maxDur = CP.settings.soundMaxDuration or 1.0
+        if maxDur > 0 then
+          C_Timer.After(maxDur, function()
+            if lastSoundHandle == handle then
+              StopSound(handle, 0)
+            end
+          end)
+        end
+      end
     end
   end)
   previewBtn:SetScript("OnEnter", function() previewTxt:SetTextColor(1, 0.82, 0) end)
   previewBtn:SetScript("OnLeave", function() previewTxt:SetTextColor(1, 1, 1) end)
+
+  stopBtn:SetScript("OnClick", function()
+    if lastSoundHandle then
+      StopSound(lastSoundHandle, 0)
+      lastSoundHandle = nil
+    end
+  end)
+  stopBtn:SetScript("OnEnter", function() stopTxt:SetTextColor(1, 0.3, 0.3) end)
+  stopBtn:SetScript("OnLeave", function() stopTxt:SetTextColor(1, 1, 1) end)
+
+  -- Sound max duration slider
+  y = y - 10
+  _, y = CreateSlider(panel, y, "Sound Max Duration", 0, 5.0, 0.1, "soundMaxDuration", "%.1fs")
 
   -- Helper for buttons (bare frames, no templates)
   local function MakeButton(parent, xAnchor, yAnchor, width, label, onClick)
@@ -391,6 +435,7 @@ function Config:SaveSettings()
     abilitiesEnabled = CP.settings.abilitiesEnabled,
     dotsEnabled = CP.settings.dotsEnabled,
     critSoundId = CP.settings.critSoundId,
+    soundMaxDuration = CP.settings.soundMaxDuration,
     bloomRadius = CP.settings.bloomRadius,
     startHeight = CP.settings.startHeight,
     nameplateOffset = CP.settings.nameplateOffset,
@@ -422,6 +467,7 @@ function Config:LoadSettings()
     CP.settings.abilitiesEnabled = saved.abilitiesEnabled ~= false
     CP.settings.dotsEnabled = saved.dotsEnabled ~= false
     CP.settings.critSoundId = saved.critSoundId or CP.settings.critSoundId
+    CP.settings.soundMaxDuration = saved.soundMaxDuration or CP.settings.soundMaxDuration
     CP.settings.bloomRadius = saved.bloomRadius or CP.settings.bloomRadius
     CP.settings.startHeight = saved.startHeight or CP.settings.startHeight
     CP.settings.nameplateOffset = saved.nameplateOffset or CP.settings.nameplateOffset
