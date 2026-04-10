@@ -69,7 +69,7 @@ end
 function UI:CreateToast()
   if self.toast then return end
 
-  local toast = CreateFrame("Frame", "ImABigDealToast", UIParent, "BackdropTemplate")
+  local toast = CreateFrame("Frame", "ImABigDealToast", UIParent)
   toast:SetSize(380, 100)
   toast:SetPoint("TOP", UIParent, "TOP", 0, -120)
   toast:SetFrameStrata("DIALOG")
