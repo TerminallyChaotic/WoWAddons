@@ -387,9 +387,17 @@ def generate_lua(characters):
 
     for name, char in sorted_chars:
         # Escape special characters for Lua strings
-        lua_name = name.lower().replace("\\", "\\\\").replace('"', '\\"')
-        lua_title = char["title"].replace("\\", "\\\\").replace('"', '\\"')
-        lua_blurb = char["blurb"].replace("\\", "\\\\").replace('"', '\\"')
+        def lua_escape(s):
+            s = s.replace("\\", "\\\\")
+            s = s.replace('"', "'")       # Replace double quotes with single
+            s = s.replace("\n", " ")       # No newlines in strings
+            s = s.replace("\r", "")
+            s = s.replace("\t", " ")
+            return s
+
+        lua_name = lua_escape(name.lower())
+        lua_title = lua_escape(char["title"])
+        lua_blurb = lua_escape(char["blurb"])
 
         lines.append(f'  ["{lua_name}"] = {{ {char["tier"]}, '
                      f'"{lua_title}", '
