@@ -8,5 +8,4 @@
 CritPopup.lua
 animations.lua
 detection.lua
-soundlist.lua
 config.lua
