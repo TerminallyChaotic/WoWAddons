@@ -117,7 +117,7 @@ function IABD:CreateSettingsPanel()
   if self.settingsPanel then return end
 
   local panel = CreateFrame("Frame", "ImABigDealPanel", UIParent)
-  panel:SetSize(350, 400)
+  panel:SetSize(350, 500)
   panel:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
   panel:SetFrameStrata("DIALOG")
   panel:EnableMouse(true)
@@ -247,8 +247,79 @@ function IABD:CreateSettingsPanel()
   y = y - 28
   MakeCheckbox(y, "Suppress Popup in Combat", "suppressInCombat")
 
+  -- Popup mode selector: manual / timed / target
   y = y - 35
-  MakeSlider(y, "Popup Duration", 2, 15, 1, "popupDuration", "%.0fs")
+  local modeLabel = panel:CreateFontString(nil, "OVERLAY")
+  modeLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", 20, y)
+  modeLabel:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+  modeLabel:SetText("Popup Mode:")
+
+  local modeNames = { "manual", "timed", "target" }
+  local modeDescriptions = {
+    manual = "Manual — stays until you close it",
+    timed = "Timed — auto-fades after duration",
+    target = "Target — dismisses on target change",
+  }
+
+  local modeText = panel:CreateFontString(nil, "OVERLAY")
+  modeText:SetPoint("TOPLEFT", panel, "TOPLEFT", 60, y - 16)
+  modeText:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+  modeText:SetTextColor(1, 0.5, 0)
+  modeText:SetText(modeDescriptions[IABD.settings.popupMode] or "Manual")
+
+  local prevMode = CreateFrame("Button", nil, panel)
+  prevMode:SetPoint("TOPLEFT", panel, "TOPLEFT", 20, y - 12)
+  prevMode:SetSize(30, 20)
+  prevMode:EnableMouse(true)
+  local prevModeBg = prevMode:CreateTexture(nil, "BACKGROUND")
+  prevModeBg:SetAllPoints()
+  prevModeBg:SetColorTexture(0.2, 0.2, 0.2, 0.9)
+  local prevModeTxt = prevMode:CreateFontString(nil, "OVERLAY")
+  prevModeTxt:SetPoint("CENTER")
+  prevModeTxt:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+  prevModeTxt:SetText("<")
+
+  local nextMode = CreateFrame("Button", nil, panel)
+  nextMode:SetPoint("LEFT", modeText, "RIGHT", 8, 0)
+  nextMode:SetSize(30, 20)
+  nextMode:EnableMouse(true)
+  local nextModeBg = nextMode:CreateTexture(nil, "BACKGROUND")
+  nextModeBg:SetAllPoints()
+  nextModeBg:SetColorTexture(0.2, 0.2, 0.2, 0.9)
+  local nextModeTxt = nextMode:CreateFontString(nil, "OVERLAY")
+  nextModeTxt:SetPoint("CENTER")
+  nextModeTxt:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+  nextModeTxt:SetText(">")
+
+  local function GetModeIndex()
+    for i, m in ipairs(modeNames) do
+      if m == IABD.settings.popupMode then return i end
+    end
+    return 1
+  end
+
+  local function UpdateModeDisplay()
+    modeText:SetText(modeDescriptions[IABD.settings.popupMode] or "Manual")
+  end
+
+  prevMode:SetScript("OnClick", function()
+    local idx = GetModeIndex() - 1
+    if idx < 1 then idx = #modeNames end
+    IABD.settings.popupMode = modeNames[idx]
+    UpdateModeDisplay()
+    IABD:SaveSettings()
+  end)
+
+  nextMode:SetScript("OnClick", function()
+    local idx = GetModeIndex() + 1
+    if idx > #modeNames then idx = 1 end
+    IABD.settings.popupMode = modeNames[idx]
+    UpdateModeDisplay()
+    IABD:SaveSettings()
+  end)
+
+  y = y - 40
+  MakeSlider(y, "Popup Duration (timed mode)", 2, 15, 1, "popupDuration", "%.0fs")
   y = y - 50
   MakeSlider(y, "Min Tier for Dot", 1, 5, 1, "minTierDot", "%.0f")
   y = y - 50

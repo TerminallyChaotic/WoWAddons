@@ -6,6 +6,7 @@ IABD.settings = {
   dotEnabled = true,
   popupEnabled = true,
   popupDuration = 5,
+  popupMode = "manual",    -- "manual" (close button), "timed" (auto-fade), "target" (dismiss on target change)
   minTierDot = 1,        -- Minimum tier to show dot (1=Common+)
   minTierPopup = 2,      -- Minimum tier to show popup (2=Uncommon+)
   suppressInCombat = true,
@@ -59,6 +60,11 @@ function IABD:OnTargetChanged()
   -- Clear previous
   self.ui:HideDot()
   self.currentTargetNPC = nil
+
+  -- In "target" mode, dismiss popup when target changes
+  if self.settings.popupMode == "target" then
+    self.ui:HideToast()
+  end
 
   -- Check if we have a target
   if not UnitExists("target") then
@@ -166,6 +172,7 @@ function IABD:SaveSettings()
     dotEnabled = self.settings.dotEnabled,
     popupEnabled = self.settings.popupEnabled,
     popupDuration = self.settings.popupDuration,
+    popupMode = self.settings.popupMode,
     minTierDot = self.settings.minTierDot,
     minTierPopup = self.settings.minTierPopup,
     suppressInCombat = self.settings.suppressInCombat,

@@ -115,6 +115,20 @@ function UI:CreateToast()
   loreText:SetWordWrap(true)
   toast.loreText = loreText
 
+  -- Close button (always visible, primary dismiss method in manual mode)
+  local closeBtn = CreateFrame("Button", nil, toast)
+  closeBtn:SetPoint("TOPRIGHT", toast, "TOPRIGHT", -6, -6)
+  closeBtn:SetSize(18, 18)
+  local closeTxt = closeBtn:CreateFontString(nil, "OVERLAY")
+  closeTxt:SetPoint("CENTER")
+  closeTxt:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+  closeTxt:SetText("X")
+  closeTxt:SetTextColor(0.6, 0.6, 0.6)
+  closeBtn:SetScript("OnClick", function() UI:HideToast() end)
+  closeBtn:SetScript("OnEnter", function() closeTxt:SetTextColor(1, 0.3, 0.3) end)
+  closeBtn:SetScript("OnLeave", function() closeTxt:SetTextColor(0.6, 0.6, 0.6) end)
+  toast.closeBtn = closeBtn
+
   -- Side border lines
   local borderLeft = toast:CreateTexture(nil, "BORDER")
   borderLeft:SetPoint("TOPLEFT", -1, 1)
@@ -134,16 +148,17 @@ function UI:CreateToast()
   borderBot:SetHeight(1)
   borderBot:SetColorTexture(0.3, 0.3, 0.3, 0.6)
 
-  -- Fade animation via OnUpdate
+  -- Timed fade via OnUpdate (only active in "timed" mode)
   toast.fadeStart = 0
   toast.fadeDelay = 5
   toast.isFading = false
   toast:SetScript("OnUpdate", function(self, elapsed)
     if not self.isFading then return end
-    local elapsed = GetTime() - self.fadeStart
-    if elapsed < self.fadeDelay then return end
+    local now = GetTime()
+    local dt = now - self.fadeStart
+    if dt < self.fadeDelay then return end
 
-    local fadeProgress = (elapsed - self.fadeDelay) / 1.0  -- 1s fade
+    local fadeProgress = (dt - self.fadeDelay) / 1.0
     if fadeProgress >= 1 then
       self:Hide()
       self.isFading = false
@@ -163,6 +178,7 @@ function UI:ShowToast(name, tier, title, lore, duration)
   local color = IABD.tierColors[tier] or { 1, 1, 1 }
   local tierName = IABD.tierNames[tier] or "Unknown"
   duration = duration or (IABD.settings and IABD.settings.popupDuration or 5)
+  local mode = IABD.settings and IABD.settings.popupMode or "manual"
 
   -- Set tier color bar
   self.toast.colorBar:SetColorTexture(color[1], color[2], color[3], 1)
@@ -185,12 +201,20 @@ function UI:ShowToast(name, tier, title, lore, duration)
   local loreHeight = self.toast.loreText:GetStringHeight() or 20
   self.toast:SetHeight(65 + loreHeight)
 
-  -- Show and start fade timer
+  -- Show
   self.toast:SetAlpha(1)
   self.toast:Show()
-  self.toast.fadeStart = GetTime()
-  self.toast.fadeDelay = duration
-  self.toast.isFading = true
+
+  -- Behavior depends on popup mode
+  if mode == "timed" then
+    -- Auto-fade after duration
+    self.toast.fadeStart = GetTime()
+    self.toast.fadeDelay = duration
+    self.toast.isFading = true
+  else
+    -- "manual" or "target": stays until closed or target changes
+    self.toast.isFading = false
+  end
 end
 
 function UI:HideToast()
