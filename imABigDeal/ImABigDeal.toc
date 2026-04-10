@@ -1,0 +1,11 @@
+## Interface: 120000
+## Title: I'm A Big Deal
+## Author: TerminallyChaotic
+## Version: 1.0.0
+## Notes: Detects lore-significant NPCs and shows their importance with a rarity dot and lore popup
+## SavedVariables: ImABigDealDB
+
+data.lua
+ui.lua
+ImABigDeal.lua
+config.lua
