@@ -247,6 +247,8 @@ function IABD:CreateSettingsPanel()
   MakeCheckbox(y, "Show Lore Popup", "popupEnabled")
   y = y - 28
   MakeCheckbox(y, "Suppress Popup in Combat", "suppressInCombat")
+  y = y - 28
+  MakeCheckbox(y, "Show Unknown NPCs (basic info)", "showUnknownNPCs")
 
   -- Popup mode selector: manual / timed / target
   y = y - 35

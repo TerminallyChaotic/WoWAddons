@@ -13,6 +13,7 @@ IABD.settings = {
   minTierPopup = 2,      -- Minimum tier to show popup (2=Uncommon+)
   suppressInCombat = true,
   seenCooldown = 60,      -- Don't re-popup same lore entry for 60 seconds
+  showUnknownNPCs = true,  -- Show basic info for NPCs not in the lore database
 }
 
 -- Runtime state
@@ -94,8 +95,14 @@ function IABD:OnTargetChanged()
   local name = UnitName("target")
   if not name then return end
 
-  -- Look up in lore database (by ID first, then by name)
+  -- Look up in lore database (by ID first, then by name, then org pattern)
   local entry = self:LookupNPC(npcID, name)
+
+  -- Fallback: build a basic entry from WoW's own NPC info
+  if not entry and self.settings.showUnknownNPCs then
+    entry = self:BuildFallbackEntry(name)
+  end
+
   if not entry then return end
 
   local tier, title, lore = entry[1], entry[2], entry[3]
@@ -125,6 +132,67 @@ function IABD:OnTargetChanged()
     self.seenNPCs[cooldownKey] = now
     self.ui:ShowToast(name, tier, title, lore, self.settings.popupDuration)
   end
+end
+
+-- Build a basic lore entry from WoW's in-game NPC info
+function IABD:BuildFallbackEntry(name)
+  if not UnitExists("target") then return nil end
+
+  -- Only show fallback for named NPCs (not generic mobs like "Wolf")
+  -- Check if the NPC has a title/guild text — indicates they're somebody
+  local creatureType = UnitCreatureType("target") or ""
+  local classification = UnitClassification("target") or "normal"
+  local level = UnitLevel("target") or 0
+  local reaction = UnitReaction("player", "target") or 4
+
+  -- Get the NPC's subtitle/guild text (shown under their name)
+  -- This uses the tooltip scanning approach
+  local subtitle = ""
+  local tooltipData = C_TooltipInfo and C_TooltipInfo.GetUnit and C_TooltipInfo.GetUnit("target")
+  if tooltipData and tooltipData.lines then
+    for i, line in ipairs(tooltipData.lines) do
+      if i == 2 and line.leftText then  -- Second line is usually the title
+        subtitle = line.leftText
+        break
+      end
+    end
+  end
+
+  -- Determine tier based on classification
+  local tier = 1  -- Common
+  if classification == "worldboss" then
+    tier = 4  -- Epic
+  elseif classification == "rareelite" then
+    tier = 3  -- Rare
+  elseif classification == "rare" then
+    tier = 3  -- Rare
+  elseif classification == "elite" then
+    tier = 2  -- Uncommon
+  end
+
+  -- Build a description from available info
+  local parts = {}
+  if subtitle ~= "" and subtitle ~= name then
+    table.insert(parts, subtitle .. ".")
+  end
+  if creatureType ~= "" then
+    table.insert(parts, creatureType .. ".")
+  end
+  if classification == "rare" or classification == "rareelite" then
+    table.insert(parts, "Rare spawn.")
+  elseif classification == "worldboss" then
+    table.insert(parts, "World Boss.")
+  elseif classification == "elite" then
+    table.insert(parts, "Elite.")
+  end
+
+  local blurb = table.concat(parts, " ")
+  if blurb == "" then
+    return nil  -- Truly nothing to show
+  end
+
+  local title = subtitle ~= "" and subtitle or creatureType
+  return { tier, title, blurb }
 end
 
 -- Build name index for /iabd lookup
@@ -193,6 +261,7 @@ function IABD:SaveSettings()
     minTierPopup = self.settings.minTierPopup,
     suppressInCombat = self.settings.suppressInCombat,
     seenCooldown = self.settings.seenCooldown,
+    showUnknownNPCs = self.settings.showUnknownNPCs,
   }
 end
 
