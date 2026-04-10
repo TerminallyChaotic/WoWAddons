@@ -1,0 +1,11 @@
+## Interface: 120000
+## Title: Crit Popup
+## Author: Claude Code
+## Version: 1.0.0
+## Notes: Chrono Trigger-style critical hit popups
+## SavedVariables: CritPopupSettings
+
+CritPopup.lua
+animations.lua
+detection.lua
+config.lua
