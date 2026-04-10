@@ -52,9 +52,20 @@ function IABD:ShowCurrentTargetInfo()
   end
 
   local entry = self:LookupNPC(npcID, name)
+  local source = "database"
   if not entry then
-    print("|cffff8000I'm A Big Deal:|r " .. name .. " (NPC ID: " .. tostring(npcID) .. ") — Not in lore database.")
-    print("  Consider submitting this NPC on GitHub!")
+    -- Try fallback
+    entry = self:BuildFallbackEntry(name)
+    source = "fallback"
+  end
+  if not entry then
+    -- Debug: show what WoW knows about this NPC
+    local ctype = UnitCreatureType("target") or "nil"
+    local class = UnitClassification("target") or "nil"
+    local lvl = UnitLevel("target") or "nil"
+    print("|cffff8000I'm A Big Deal:|r " .. name .. " (NPC ID: " .. tostring(npcID) .. ") — Not found anywhere.")
+    print("  CreatureType: " .. ctype .. ", Classification: " .. class .. ", Level: " .. tostring(lvl))
+    print("  Fallback returned nil — no displayable info.")
     return
   end
 

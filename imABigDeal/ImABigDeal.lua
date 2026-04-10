@@ -145,15 +145,17 @@ function IABD:BuildFallbackEntry(name)
   local level = UnitLevel("target") or 0
   local reaction = UnitReaction("player", "target") or 4
 
-  -- Get the NPC's subtitle/guild text (shown under their name)
-  -- This uses the tooltip scanning approach
+  -- Scan tooltip for all available info (subtitle, faction, quests, etc.)
   local subtitle = ""
+  local tooltipLines = {}
   local tooltipData = C_TooltipInfo and C_TooltipInfo.GetUnit and C_TooltipInfo.GetUnit("target")
   if tooltipData and tooltipData.lines then
     for i, line in ipairs(tooltipData.lines) do
-      if i == 2 and line.leftText then  -- Second line is usually the title
-        subtitle = line.leftText
-        break
+      local text = line.leftText or ""
+      if i == 2 and text ~= "" and text ~= name then
+        subtitle = text  -- Line 2 is the title/subtitle
+      elseif i > 2 and text ~= "" then
+        table.insert(tooltipLines, text)
       end
     end
   end
@@ -170,14 +172,25 @@ function IABD:BuildFallbackEntry(name)
     tier = 2  -- Uncommon
   end
 
-  -- Build a description from available info
+  -- Named NPCs with a subtitle are at least Uncommon
+  -- (generic unnamed mobs stay Common)
+  if subtitle ~= "" and tier < 2 then
+    tier = 2
+  end
+
+  -- Check quest-related status
+  local isQuestBoss = UnitIsQuestBoss and UnitIsQuestBoss("target")
+  local canInteract = CheckInteractDistance and CheckInteractDistance("target", 1)
+
+  -- Build a description from all available info
   local parts = {}
+
+  -- Subtitle (title/role)
   if subtitle ~= "" and subtitle ~= name then
     table.insert(parts, subtitle .. ".")
   end
-  if creatureType ~= "" then
-    table.insert(parts, creatureType .. ".")
-  end
+
+  -- Classification
   if classification == "rare" or classification == "rareelite" then
     table.insert(parts, "Rare spawn.")
   elseif classification == "worldboss" then
@@ -186,9 +199,31 @@ function IABD:BuildFallbackEntry(name)
     table.insert(parts, "Elite.")
   end
 
+  -- Creature type
+  if creatureType ~= "" and creatureType ~= "Not specified" then
+    table.insert(parts, creatureType .. ".")
+  end
+
+  -- Quest involvement
+  if isQuestBoss then
+    table.insert(parts, "Quest objective.")
+  end
+
+  -- Extra tooltip lines (often contain faction, quest info, or flavor text)
+  for _, tooltipLine in ipairs(tooltipLines) do
+    -- Skip generic lines like level info or faction standing
+    local skip = false
+    if tooltipLine:match("^Level") then skip = true end
+    if tooltipLine:match("^%d+") then skip = true end  -- health/power numbers
+
+    if not skip and #parts < 6 then  -- cap at 6 parts to keep it readable
+      table.insert(parts, tooltipLine)
+    end
+  end
+
   local blurb = table.concat(parts, " ")
   if blurb == "" then
-    return nil  -- Truly nothing to show
+    return nil
   end
 
   local title = subtitle ~= "" and subtitle or creatureType
