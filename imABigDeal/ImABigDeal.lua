@@ -12,14 +12,27 @@ IABD.settings = {
   minTierDot = 1,        -- Minimum tier to show dot (1=Common+)
   minTierPopup = 2,      -- Minimum tier to show popup (2=Uncommon+)
   suppressInCombat = true,
-  seenCooldown = 60,      -- Don't re-popup same lore entry for 60 seconds
+  seenCooldown = 15,      -- Don't re-popup same NPC for 15 seconds
   showUnknownNPCs = true,  -- Show basic info for NPCs not in the lore database
+  -- Sound
+  legendarySoundEnabled = true,
+  legendarySoundID = 8455,   -- Fanfare by default
+  epicSoundEnabled = false,
+  epicSoundID = 12867,       -- Achievement
+  -- Discovery
+  discoveryEnabled = true,
+  discoveryTrackAll = false,  -- Track all NPCs or only database entries
 }
 
 -- Runtime state
 IABD.seenNPCs = {}        -- { [npcID] = lastSeenTime }
 IABD.currentTargetNPC = nil
+IABD.currentEntry = nil
 IABD.isInitialized = false
+IABD.debugMode = false
+
+-- Discovery collection (persisted in SavedVariables)
+IABD.discovered = {}       -- { [name] = { tier, title, firstSeen, count } }
 
 -- Extract NPC ID from a GUID
 -- Format: "Creature-0-XXXX-XXXX-XXXX-NPCID-INSTANCE"
@@ -99,8 +112,12 @@ function IABD:OnTargetChanged()
     return
   end
 
+  local dbg = self.debugMode
+  if dbg then print("|cffff8000IABD Debug:|r OnTargetChanged fired") end
+
   -- Only care about NPCs (not players)
   if UnitIsPlayer("target") then
+    if dbg then print("  -> Skipped: is a player") end
     return
   end
 
@@ -108,44 +125,92 @@ function IABD:OnTargetChanged()
   local guid = UnitGUID("target")
   local npcID = self:GetNPCIdFromGUID(guid)
   local name = UnitName("target")
-  if not name then return end
+  if not name then
+    if dbg then print("  -> Skipped: no name") end
+    return
+  end
+
+  if dbg then print("  -> Target: " .. name .. " (NPC " .. tostring(npcID) .. ")") end
 
   -- Look up in lore database (by ID first, then by name, then org pattern)
   local entry = self:LookupNPC(npcID, name)
+  if dbg then print("  -> LookupNPC: " .. (entry and "FOUND" or "nil")) end
 
   -- Fallback: build a basic entry from WoW's own NPC info
   if not entry and self.settings.showUnknownNPCs then
     entry = self:BuildFallbackEntry(name)
+    if dbg then print("  -> Fallback: " .. (entry and "FOUND" or "nil")) end
+  elseif not entry then
+    if dbg then print("  -> showUnknownNPCs is OFF") end
   end
 
-  if not entry then return end
+  if not entry then
+    if dbg then print("  -> No entry found, aborting") end
+    return
+  end
 
   local tier, title, lore = entry[1], entry[2], entry[3]
   self.currentTargetNPC = npcID
+  self.currentEntry = entry
+  if dbg then print("  -> Tier: " .. tier .. ", Title: " .. tostring(title)) end
+
+  -- Play sound for high-tier targets
+  if tier >= 5 and self.settings.legendarySoundEnabled and self.settings.legendarySoundID then
+    PlaySound(self.settings.legendarySoundID, "SFX")
+  elseif tier >= 4 and self.settings.epicSoundEnabled and self.settings.epicSoundID then
+    PlaySound(self.settings.epicSoundID, "SFX")
+  end
+
+  -- Discovery tracking
+  if self.settings.discoveryEnabled then
+    local shouldTrack = (tier >= 2) or self.settings.discoveryTrackAll
+    if shouldTrack and name then
+      local isNew = not self.discovered[name]
+      if isNew then
+        self.discovered[name] = {
+          tier = tier,
+          title = title or "",
+          firstSeen = time(),
+          count = 1,
+        }
+        self:SaveDiscovery()
+        if dbg then print("  -> Discovery: NEW! (" .. self:GetDiscoveryCount() .. " total)") end
+      else
+        self.discovered[name].count = (self.discovered[name].count or 0) + 1
+      end
+    end
+  end
 
   -- Dot ALWAYS shows on target (no cooldown)
   if self.settings.dotEnabled and tier >= self.settings.minTierDot then
     self.ui:ShowDot(tier)
+    if dbg then print("  -> Dot: SHOWN") end
+  else
+    if dbg then print("  -> Dot: filtered (tier " .. tier .. " < min " .. self.settings.minTierDot .. ")") end
   end
 
-  -- Popup respects cooldown (keyed by lore title, not NPC ID)
+  -- Popup respects cooldown
   if self.settings.popupEnabled and tier >= self.settings.minTierPopup then
     -- Suppress in combat if setting is on
     if self.settings.suppressInCombat and InCombatLockdown() then
+      if dbg then print("  -> Popup: BLOCKED by combat") end
       return
     end
 
-    -- Cooldown keyed by lore entry title so all "Twilight's Hammer"
-    -- mobs share one cooldown, but different orgs/characters are separate
-    local cooldownKey = title or name
+    local cooldownKey = name
     local now = GetTime()
     local lastSeen = self.seenNPCs[cooldownKey]
     if lastSeen and (now - lastSeen) < self.settings.seenCooldown then
+      if dbg then print("  -> Popup: BLOCKED by cooldown (" .. math.floor(now - lastSeen) .. "s ago)") end
       return
     end
 
     self.seenNPCs[cooldownKey] = now
-    self.ui:ShowToast(name, tier, title, lore, self.settings.popupDuration)
+    local isNewDiscovery = self.settings.discoveryEnabled and self.discovered[name] and self.discovered[name].count == 1
+    self.ui:ShowToast(name, tier, title, lore, self.settings.popupDuration, isNewDiscovery)
+    if dbg then print("  -> Popup: SHOWN" .. (isNewDiscovery and " (NEW DISCOVERY!)" or "")) end
+  else
+    if dbg then print("  -> Popup: filtered (enabled=" .. tostring(self.settings.popupEnabled) .. ", tier " .. tier .. " < min " .. self.settings.minTierPopup .. ")") end
   end
 end
 
@@ -246,6 +311,36 @@ function IABD:BuildFallbackEntry(name)
   return { tier, title, blurb }
 end
 
+-- ============================================================
+-- Discovery System
+-- ============================================================
+
+function IABD:GetDiscoveryCount()
+  local count = 0
+  for _ in pairs(self.discovered) do count = count + 1 end
+  return count
+end
+
+function IABD:GetDiscoveryByTier()
+  local counts = { [1] = 0, [2] = 0, [3] = 0, [4] = 0, [5] = 0 }
+  for _, entry in pairs(self.discovered) do
+    local t = entry.tier or 1
+    counts[t] = (counts[t] or 0) + 1
+  end
+  return counts
+end
+
+function IABD:SaveDiscovery()
+  if not ImABigDealDB then ImABigDealDB = {} end
+  ImABigDealDB.discovered = self.discovered
+end
+
+function IABD:LoadDiscovery()
+  if ImABigDealDB and ImABigDealDB.discovered then
+    self.discovered = ImABigDealDB.discovered
+  end
+end
+
 -- Build name index for /iabd lookup
 function IABD:BuildNameIndex()
   self.nameIndex = {}
@@ -263,8 +358,9 @@ end
 function IABD:Initialize()
   if self.isInitialized then return end
 
-  -- Load saved settings
+  -- Load saved settings and discovery data
   self:LoadSettings()
+  self:LoadDiscovery()
 
   -- Create UI elements
   self.ui:CreatePortraitDot()
@@ -293,7 +389,8 @@ function IABD:Initialize()
 
   local count = 0
   for _ in pairs(self.loreDB) do count = count + 1 end
-  print("|cffff8000I'm A Big Deal|r v1.0 loaded — " .. count .. " lore entries")
+  local discovered = self:GetDiscoveryCount()
+  print("|cffff8000I'm A Big Deal|r v1.0 loaded — " .. count .. " lore entries, " .. discovered .. " discovered")
 
   self.isInitialized = true
 end

@@ -155,6 +155,38 @@ function UI:CreateToast()
   loreText:SetWordWrap(true)
   toast.loreText = loreText
 
+  -- "NEW!" badge (hidden by default)
+  local newBadge = toast:CreateFontString(nil, "OVERLAY")
+  newBadge:SetPoint("RIGHT", tierLabel, "RIGHT", 60, 0)
+  newBadge:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE, THICKOUTLINE")
+  newBadge:SetText("NEW DISCOVERY!")
+  newBadge:SetTextColor(0, 1, 0)
+  newBadge:Hide()
+  toast.newBadge = newBadge
+
+  -- Discovery counter
+  local discoverCount = toast:CreateFontString(nil, "OVERLAY")
+  discoverCount:SetPoint("BOTTOMRIGHT", toast, "BOTTOMRIGHT", -10, 6)
+  discoverCount:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+  discoverCount:SetTextColor(0.5, 0.5, 0.5)
+  toast.discoverCount = discoverCount
+
+  -- Click hint
+  local clickHint = toast:CreateFontString(nil, "OVERLAY")
+  clickHint:SetPoint("BOTTOMLEFT", toast, "BOTTOMLEFT", 14, 6)
+  clickHint:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+  clickHint:SetTextColor(0.4, 0.4, 0.4)
+  clickHint:SetText("Click for details")
+  toast.clickHint = clickHint
+
+  -- Make toast clickable for expanded view
+  toast:EnableMouse(true)
+  toast:SetScript("OnMouseUp", function(self, button)
+    if button == "LeftButton" then
+      UI:ShowExpandedView()
+    end
+  end)
+
   -- Close button (always visible, primary dismiss method in manual mode)
   local closeBtn = CreateFrame("Button", nil, toast)
   closeBtn:SetPoint("TOPRIGHT", toast, "TOPRIGHT", -6, -6)
@@ -311,7 +343,7 @@ function UI:HideAnchor()
   end
 end
 
-function UI:ShowToast(name, tier, title, lore, duration)
+function UI:ShowToast(name, tier, title, lore, duration, isNewDiscovery)
   if not self.toast then self:CreateToast() end
 
   -- Always apply saved position
@@ -339,9 +371,20 @@ function UI:ShowToast(name, tier, title, lore, duration)
   -- Set lore
   self.toast.loreText:SetText(lore)
 
+  -- NEW badge
+  if isNewDiscovery then
+    self.toast.newBadge:Show()
+  else
+    self.toast.newBadge:Hide()
+  end
+
+  -- Discovery counter
+  local total = IABD:GetDiscoveryCount()
+  self.toast.discoverCount:SetText(total .. " discovered")
+
   -- Resize toast to fit lore text
   local loreHeight = self.toast.loreText:GetStringHeight() or 20
-  self.toast:SetHeight(65 + loreHeight)
+  self.toast:SetHeight(75 + loreHeight)
 
   -- Show
   self.toast:SetAlpha(1)
@@ -365,4 +408,178 @@ function UI:HideToast()
     self.toast.isFading = false
     self.toast:SetAlpha(1)
   end
+end
+
+-- ============================================================
+-- Expanded Detail View (click toast to open)
+-- ============================================================
+
+function UI:CreateExpandedView()
+  if self.expanded then return end
+
+  local panel = CreateFrame("Frame", "ImABigDealExpanded", UIParent)
+  panel:SetSize(420, 300)
+  panel:SetPoint("CENTER", UIParent, "CENTER", 0, 50)
+  panel:SetFrameStrata("DIALOG")
+  panel:EnableMouse(true)
+  panel:SetMovable(true)
+  panel:RegisterForDrag("LeftButton")
+  panel:SetScript("OnDragStart", panel.StartMoving)
+  panel:SetScript("OnDragStop", panel.StopMovingOrSizing)
+
+  -- Background
+  local bg = panel:CreateTexture(nil, "BACKGROUND")
+  bg:SetAllPoints()
+  bg:SetColorTexture(0.03, 0.03, 0.06, 0.95)
+
+  -- Top color bar
+  local bar = panel:CreateTexture(nil, "ARTWORK")
+  bar:SetPoint("TOPLEFT", 0, 0)
+  bar:SetPoint("TOPRIGHT", 0, 0)
+  bar:SetHeight(4)
+  panel.colorBar = bar
+
+  -- Borders
+  for _, edge in ipairs({
+    {"TOPLEFT", "BOTTOMLEFT", 1, false},
+    {"TOPRIGHT", "BOTTOMRIGHT", 1, false},
+    {"BOTTOMLEFT", "BOTTOMRIGHT", 1, true},
+  }) do
+    local b = panel:CreateTexture(nil, "BORDER")
+    if edge[4] then
+      b:SetPoint("BOTTOMLEFT", -1, -1)
+      b:SetPoint("BOTTOMRIGHT", 1, -1)
+      b:SetHeight(1)
+    else
+      b:SetPoint(edge[1], edge[1]:find("RIGHT") and 1 or -1, 1)
+      b:SetPoint(edge[2], edge[2]:find("RIGHT") and 1 or -1, -1)
+      b:SetWidth(1)
+    end
+    b:SetColorTexture(0.4, 0.4, 0.4, 0.5)
+  end
+
+  -- Close button
+  local closeBtn = CreateFrame("Button", nil, panel)
+  closeBtn:SetPoint("TOPRIGHT", -8, -8)
+  closeBtn:SetSize(20, 20)
+  local closeTxt = closeBtn:CreateFontString(nil, "OVERLAY")
+  closeTxt:SetPoint("CENTER")
+  closeTxt:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE")
+  closeTxt:SetText("X")
+  closeTxt:SetTextColor(0.8, 0.2, 0.2)
+  closeBtn:SetScript("OnClick", function() panel:Hide() end)
+
+  -- Tier label
+  local tierLabel = panel:CreateFontString(nil, "OVERLAY")
+  tierLabel:SetPoint("TOPLEFT", 20, -14)
+  tierLabel:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+  panel.tierLabel = tierLabel
+
+  -- NPC name (big)
+  local nameText = panel:CreateFontString(nil, "OVERLAY")
+  nameText:SetPoint("TOPLEFT", 20, -30)
+  nameText:SetFont("Fonts\\FRIZQT__.TTF", 20, "OUTLINE, THICKOUTLINE")
+  panel.nameText = nameText
+
+  -- Title
+  local titleText = panel:CreateFontString(nil, "OVERLAY")
+  titleText:SetPoint("TOPLEFT", 20, -55)
+  titleText:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+  titleText:SetTextColor(0.7, 0.7, 0.7)
+  panel.titleText = titleText
+
+  -- Divider line
+  local divider = panel:CreateTexture(nil, "ARTWORK")
+  divider:SetPoint("TOPLEFT", 20, -75)
+  divider:SetPoint("RIGHT", panel, "RIGHT", -20, 0)
+  divider:SetHeight(1)
+  divider:SetColorTexture(0.3, 0.3, 0.3, 0.6)
+
+  -- Full lore text (scrollable area)
+  local loreText = panel:CreateFontString(nil, "OVERLAY")
+  loreText:SetPoint("TOPLEFT", 20, -85)
+  loreText:SetPoint("RIGHT", panel, "RIGHT", -20, 0)
+  loreText:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+  loreText:SetTextColor(0.9, 0.9, 0.9)
+  loreText:SetJustifyH("LEFT")
+  loreText:SetWordWrap(true)
+  panel.loreText = loreText
+
+  -- In-game info section
+  local infoLabel = panel:CreateFontString(nil, "OVERLAY")
+  infoLabel:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", 20, 40)
+  infoLabel:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+  infoLabel:SetTextColor(0.5, 0.5, 0.5)
+  panel.infoLabel = infoLabel
+
+  -- Discovery info
+  local discoveryLabel = panel:CreateFontString(nil, "OVERLAY")
+  discoveryLabel:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", 20, 14)
+  discoveryLabel:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+  discoveryLabel:SetTextColor(0.5, 0.5, 0.5)
+  panel.discoveryLabel = discoveryLabel
+
+  panel:Hide()
+  self.expanded = panel
+end
+
+function UI:ShowExpandedView()
+  if not self.expanded then self:CreateExpandedView() end
+  if not IABD.currentEntry then return end
+
+  local entry = IABD.currentEntry
+  local tier = entry[1]
+  local title = entry[2] or ""
+  local lore = entry[3] or ""
+  local name = UnitExists("target") and UnitName("target") or "Unknown"
+  local color = IABD.tierColors[tier] or { 1, 1, 1 }
+  local tierName = IABD.tierNames[tier] or "Unknown"
+
+  -- Color bar
+  self.expanded.colorBar:SetColorTexture(color[1], color[2], color[3], 1)
+
+  -- Tier
+  self.expanded.tierLabel:SetText(string.upper(tierName))
+  self.expanded.tierLabel:SetTextColor(color[1], color[2], color[3])
+
+  -- Name
+  self.expanded.nameText:SetText(name)
+  self.expanded.nameText:SetTextColor(color[1], color[2], color[3])
+
+  -- Title
+  self.expanded.titleText:SetText(title)
+
+  -- Full lore (not truncated)
+  self.expanded.loreText:SetText(lore)
+
+  -- In-game info
+  local infoParts = {}
+  if UnitExists("target") then
+    local ctype = UnitCreatureType("target")
+    local classification = UnitClassification("target")
+    local level = UnitLevel("target")
+    if level and level > 0 then table.insert(infoParts, "Level " .. level) end
+    if ctype then table.insert(infoParts, ctype) end
+    if classification and classification ~= "normal" then
+      table.insert(infoParts, classification:sub(1,1):upper() .. classification:sub(2))
+    end
+  end
+  self.expanded.infoLabel:SetText(table.concat(infoParts, " | "))
+
+  -- Discovery info
+  local disc = IABD.discovered[name]
+  if disc then
+    local seenText = "Discovered | Seen " .. (disc.count or 1) .. " time(s)"
+    self.expanded.discoveryLabel:SetText(seenText)
+    self.expanded.discoveryLabel:SetTextColor(0, 0.8, 0)
+  else
+    self.expanded.discoveryLabel:SetText("Not yet discovered")
+    self.expanded.discoveryLabel:SetTextColor(0.5, 0.5, 0.5)
+  end
+
+  -- Resize to fit lore
+  local loreHeight = self.expanded.loreText:GetStringHeight() or 40
+  self.expanded:SetHeight(math.max(180, 100 + loreHeight + 50))
+
+  self.expanded:Show()
 end
