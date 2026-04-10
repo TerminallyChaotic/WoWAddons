@@ -33,6 +33,27 @@ function UI:CreatePortraitDot()
   self.dot = dot
 end
 
+-- Find the target frame (12.0 may use different names)
+function UI:FindTargetFrame()
+  -- Try common target frame names across WoW versions
+  local candidates = {
+    TargetFrame,
+    _G["TargetFrame"],
+    _G["TargetUnitFrame"],
+    _G["CompactUnitFrame_Target"],
+  }
+  for _, frame in ipairs(candidates) do
+    if frame and frame.IsShown and frame:IsShown() then
+      return frame
+    end
+  end
+  -- Last resort: try to find any frame with "target" in its name
+  for _, frame in ipairs(candidates) do
+    if frame then return frame end
+  end
+  return nil
+end
+
 function UI:ShowDot(tier)
   if not self.dot then self:CreatePortraitDot() end
 
@@ -42,13 +63,15 @@ function UI:ShowDot(tier)
     return
   end
 
-  -- Anchor to TargetFrame if it exists
+  -- Find and anchor to the target portrait frame
+  local targetFrame = self:FindTargetFrame()
   self.dot:ClearAllPoints()
-  if TargetFrame then
-    self.dot:SetPoint("TOPRIGHT", TargetFrame, "TOPRIGHT", -4, -4)
+  if targetFrame then
+    self.dot:SetPoint("TOPRIGHT", targetFrame, "TOPRIGHT", -4, -4)
+    self.dot:SetFrameLevel(targetFrame:GetFrameLevel() + 5)
   else
-    self.dot:Hide()
-    return
+    -- Fallback: top-left area of screen where target frame usually is
+    self.dot:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 280, -20)
   end
 
   self.dot.texture:SetVertexColor(color[1], color[2], color[3], 1)
