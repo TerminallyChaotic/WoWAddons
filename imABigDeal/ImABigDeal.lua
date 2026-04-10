@@ -140,6 +140,8 @@ function IABD:OnTargetChanged()
   if not entry and self.settings.showUnknownNPCs then
     entry = self:BuildFallbackEntry(name)
     if dbg then print("  -> Fallback: " .. (entry and "FOUND" or "nil")) end
+    -- Track unknown NPC ID for bulk scraping later
+    if npcID then self:TrackUnknownNPC(npcID, name) end
   elseif not entry then
     if dbg then print("  -> showUnknownNPCs is OFF") end
   end
@@ -161,10 +163,18 @@ function IABD:OnTargetChanged()
     PlaySound(self.settings.epicSoundID, "SFX")
   end
 
-  -- Discovery tracking
-  if self.settings.discoveryEnabled then
-    local shouldTrack = (tier >= 2) or self.settings.discoveryTrackAll
-    if shouldTrack and name then
+  -- Discovery tracking (only unique named characters, not generic mobs)
+  if self.settings.discoveryEnabled and name then
+    -- Only track NPCs that are in the lore database or nameOverrides
+    -- (not fallback/generic NPCs like "Stormwind Guard" or "Twilight Cultist")
+    local isNamedCharacter = false
+    if npcID and self.loreDB and self.loreDB[npcID] then
+      isNamedCharacter = true
+    elseif self.nameOverrides and self.nameOverrides[string.lower(name)] then
+      isNamedCharacter = true
+    end
+
+    if isNamedCharacter then
       local isNew = not self.discovered[name]
       if isNew then
         self.discovered[name] = {
@@ -178,6 +188,8 @@ function IABD:OnTargetChanged()
       else
         self.discovered[name].count = (self.discovered[name].count or 0) + 1
       end
+    elseif dbg then
+      print("  -> Discovery: skipped (not a named lore character)")
     end
   end
 
@@ -339,6 +351,36 @@ function IABD:LoadDiscovery()
   if ImABigDealDB and ImABigDealDB.discovered then
     self.discovered = ImABigDealDB.discovered
   end
+end
+
+-- Track unknown NPC IDs for bulk scraping
+IABD.unknownNPCIds = {}
+
+function IABD:TrackUnknownNPC(npcID, name)
+  if npcID and not self.unknownNPCIds[npcID] then
+    self.unknownNPCIds[npcID] = name or "Unknown"
+  end
+end
+
+function IABD:ExportUnknownNPCs()
+  local count = 0
+  local ids = {}
+  for id, name in pairs(self.unknownNPCIds) do
+    table.insert(ids, id)
+    count = count + 1
+  end
+  if count == 0 then
+    print("|cffff8000I'm A Big Deal:|r No unknown NPCs collected this session.")
+    return
+  end
+  table.sort(ids)
+  print("|cffff8000I'm A Big Deal:|r " .. count .. " unknown NPC IDs this session:")
+  local idStrings = {}
+  for _, id in ipairs(ids) do
+    table.insert(idStrings, tostring(id))
+  end
+  -- Print in bulk-scraper-friendly format
+  print(table.concat(idStrings, "\n"))
 end
 
 -- Build name index for /iabd lookup

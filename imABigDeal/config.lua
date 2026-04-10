@@ -26,6 +26,8 @@ SlashCmdList["IMABIGDEAL"] = function(msg)
     print("  |cff0070ddRare:|r " .. byTier[3])
     print("  |cff1eff00Uncommon:|r " .. byTier[2])
     print("  |cffffffffCommon:|r " .. byTier[1])
+  elseif msg == "export" then
+    IABD:ExportUnknownNPCs()
   elseif msg == "debug" then
     IABD.debugMode = not IABD.debugMode
     print("|cffff8000I'm A Big Deal:|r Debug mode " .. (IABD.debugMode and "ON" or "OFF"))
