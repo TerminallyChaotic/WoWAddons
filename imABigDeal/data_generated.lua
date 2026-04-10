@@ -3154,7 +3154,7 @@ for name, entry in pairs({
   ["clai"] = { 2, "soldier under Lorena", "Clai is a soldier under Lorena. He accompanied Lorena and her army out of Northwatch." },
   ["claim miner"] = { 2, "", "Claim Miners are draenei located at Kuuro's Claim in Talador. Many have been killed and can be found throughout the mine, often with Glowgullet Devourers feasting on their remains." },
   ["claims adjuster"] = { 2, "goblin", "The Claims Adjuster is a goblin who is to inspect the KTC Headquarters in Kezan insurance claim during   [1-20] 447." },
-  ["claire \"the fox\"'] = { 2, "worgen located at Lunarfall in Shadowmoon Valley", "Claire \"the Fox\" is a worgen located at Lunarfall in Shadowmoon Valley. She can only be recruited using the Headhunter's Harvest from Lunarfall Inn." },
+  ["claire 'the fox'"] = { 2, "worgen located at Lunarfall in Shadowmoon Valley", "Claire 'the Fox' is a worgen located at Lunarfall in Shadowmoon Valley. She can only be recruited using the Headhunter's Harvest from Lunarfall Inn." },
   ["clandestine operative"] = { 2, "", "Clandestine Operatives are dead brokers located in the Planes of Torment in the Maw. They were transporting the Broker Cache but were killed by Inquisitor Devaki." },
   ["clank coppernozzle"] = { 2, "goblin weapon vendor summoned by the  [Goblin Town-in-a-Box]", "Clank Coppernozzle is a goblin weapon vendor summoned by the  [Goblin Town-in-a-Box]. He has the  Toy Stability buff which lasts for 20 minutes, afterwards he'll despawn." },
   ["clara henry"] = { 2, "human located in the Shrine of Seven Stars", "Clara Henry is a human located in the Shrine of Seven Stars. She originally appeared in worgen form." },

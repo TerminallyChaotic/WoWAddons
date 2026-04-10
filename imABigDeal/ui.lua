@@ -16,30 +16,32 @@ function UI:CreatePortraitDot()
   dot:SetFrameStrata("TOOLTIP")
   dot:SetFrameLevel(100)
 
-  -- Outer glow (solid color, slightly larger, faded)
+  -- Glow (larger, faded circle behind the main dot)
   local glow = dot:CreateTexture(nil, "BACKGROUND")
   glow:SetPoint("CENTER")
-  glow:SetSize(32, 32)
-  glow:SetColorTexture(1, 1, 1, 0.3)
+  glow:SetSize(34, 34)
+  glow:SetTexture("Interface\\CHARACTERFRAME\\TempPortraitAlphaMask")
+  glow:SetAlpha(0.35)
   dot.glow = glow
 
-  -- Main dot (solid colored square — reliable in all WoW versions)
-  local tex = dot:CreateTexture(nil, "ARTWORK")
-  tex:SetAllPoints()
-  tex:SetColorTexture(1, 1, 1, 1)
-  dot.texture = tex
+  -- Dark border ring
+  local ring = dot:CreateTexture(nil, "BORDER")
+  ring:SetPoint("CENTER")
+  ring:SetSize(28, 28)
+  ring:SetTexture("Interface\\CHARACTERFRAME\\TempPortraitAlphaMask")
+  ring:SetVertexColor(0, 0, 0, 0.8)
+  dot.ring = ring
 
-  -- Inner border to give it depth
-  local border = dot:CreateTexture(nil, "OVERLAY")
-  border:SetPoint("TOPLEFT", 2, -2)
-  border:SetPoint("BOTTOMRIGHT", -2, 2)
-  border:SetColorTexture(0, 0, 0, 0.5)
-  dot.innerBorder = border
+  -- Main colored circle (portrait mask = guaranteed round texture)
+  local circle = dot:CreateTexture(nil, "ARTWORK")
+  circle:SetAllPoints()
+  circle:SetTexture("Interface\\CHARACTERFRAME\\TempPortraitAlphaMask")
+  dot.circle = circle
 
-  -- Tier letter overlay (L, E, R, U, C)
+  -- Tier letter overlay
   local letter = dot:CreateFontString(nil, "OVERLAY")
   letter:SetPoint("CENTER", 0, 0)
-  letter:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE, THICKOUTLINE")
+  letter:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE, THICKOUTLINE")
   dot.letter = letter
 
   dot:Hide()
@@ -77,12 +79,9 @@ function UI:ShowDot(tier)
     self.dot:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 280, -30)
   end
 
-  -- Color the dot with tier color (using SetColorTexture — always works)
-  self.dot.texture:SetColorTexture(color[1], color[2], color[3], 1)
-  self.dot.glow:SetColorTexture(color[1], color[2], color[3], 0.3)
-
-  -- Inner border stays dark for contrast
-  self.dot.innerBorder:SetColorTexture(0, 0, 0, 0.4)
+  -- Color the circle
+  self.dot.circle:SetVertexColor(color[1], color[2], color[3], 1)
+  self.dot.glow:SetVertexColor(color[1], color[2], color[3], 0.35)
 
   -- Letter in contrasting color (dark on bright, white on dark)
   local brightness = color[1] * 0.3 + color[2] * 0.6 + color[3] * 0.1
