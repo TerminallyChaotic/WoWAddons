@@ -279,8 +279,12 @@ function Config:CreatePanel()
   previewBtn:SetScript("OnClick", function()
     local idx = CP.settings.critSoundId or 1
     local entry = CP.critSounds[idx + 1]
-    if entry and entry.soundID then
-      PlaySound(entry.soundID, "SFX")
+    if entry then
+      if entry.file then
+        PlaySoundFile(entry.file, "SFX")
+      elseif entry.soundID then
+        PlaySound(entry.soundID, "SFX")
+      end
     end
   end)
   previewBtn:SetScript("OnEnter", function() previewTxt:SetTextColor(1, 0.82, 0) end)
@@ -331,6 +335,24 @@ function Config:CreatePanel()
     end
   end)
 
+  -- Reset to Defaults button
+  y = y - 35
+  MakeButton(panel, 20, y, 340, "Reset All Settings to Defaults", function()
+    local defaults = {
+      position = "head", customX = 0, customY = 0, queueMode = "stack",
+      durationSeconds = 1.5, autoAttacksEnabled = true, abilitiesEnabled = true,
+      dotsEnabled = true, critSoundId = 1, customSounds = {},
+      bloomRadius = 80, startHeight = 60, nameplateOffset = 30,
+      normalFontSize = 48, critFontSize = 72, animIntensity = 1.0, digitSpacing = 5,
+    }
+    for k, v in pairs(defaults) do
+      CP.settings[k] = v
+    end
+    CP:RebuildSoundList()
+    Config:SaveSettings()
+    print("|cff00ff00Crit Drop:|r Settings reset to defaults. /reload to refresh the panel.")
+  end)
+
   panel:Hide()  -- start hidden, /cp will show it
   CP.settingsPanel = panel
 
@@ -378,6 +400,7 @@ function Config:SaveSettings()
     critFontSize = CP.settings.critFontSize,
     animIntensity = CP.settings.animIntensity,
     digitSpacing = CP.settings.digitSpacing,
+    customSounds = CP.settings.customSounds,
   }
 end
 
@@ -407,6 +430,7 @@ function Config:LoadSettings()
     CP.settings.critFontSize = saved.critFontSize or CP.settings.critFontSize
     CP.settings.animIntensity = saved.animIntensity or CP.settings.animIntensity
     CP.settings.digitSpacing = saved.digitSpacing or CP.settings.digitSpacing
+    CP.settings.customSounds = saved.customSounds or CP.settings.customSounds
   end
 end
 
@@ -417,11 +441,15 @@ SLASH_CRITPOPUP1 = "/critpopup"
 SLASH_CRITPOPUP2 = "/cp"
 
 SlashCmdList["CRITPOPUP"] = function(msg)
-  if msg == "toggle" or msg == "" then
+  msg = msg or ""
+  local cmd = msg:match("^(%S+)") or ""
+  local arg = msg:match("^%S+%s+(.+)") or ""
+
+  if cmd == "" or cmd == "toggle" then
     CP.config:TogglePanel()
-  elseif msg == "test" then
+  elseif cmd == "test" then
     CP:TestAnimation()
-  elseif msg == "testcrit" then
+  elseif cmd == "testcrit" then
     if CP.animations then
       local frame = CP.animations:CreatePopupFrame(math.random(5000, 25000), "test")
       frame.textColor = {1, 0.82, 0, 1}
@@ -430,11 +458,65 @@ SlashCmdList["CRITPOPUP"] = function(msg)
       frame:Show()
       CP.animations:PlaySequence(frame, CP.settings.durationSeconds)
     end
+  elseif cmd == "addsound" then
+    if arg == "" then
+      print("|cffff0000Crit Drop:|r Usage: /cp addsound filename.ogg")
+      return
+    end
+    -- Check it ends with .ogg
+    if not arg:match("%.ogg$") then
+      print("|cffff0000Crit Drop:|r Only .ogg files are supported.")
+      return
+    end
+    -- Check for duplicates
+    for _, existing in ipairs(CP.settings.customSounds) do
+      if existing == arg then
+        print("|cffff0000Crit Drop:|r '" .. arg .. "' is already registered.")
+        return
+      end
+    end
+    table.insert(CP.settings.customSounds, arg)
+    CP:RebuildSoundList()
+    CP.config:SaveSettings()
+    print("|cff00ff00Crit Drop:|r Added custom sound '" .. arg .. "'. Select it in /cp settings.")
+  elseif cmd == "removesound" then
+    if arg == "" then
+      print("|cffff0000Crit Drop:|r Usage: /cp removesound filename.ogg")
+      return
+    end
+    local found = false
+    for i, existing in ipairs(CP.settings.customSounds) do
+      if existing == arg then
+        table.remove(CP.settings.customSounds, i)
+        found = true
+        break
+      end
+    end
+    if found then
+      CP:RebuildSoundList()
+      CP.config:SaveSettings()
+      print("|cff00ff00Crit Drop:|r Removed custom sound '" .. arg .. "'.")
+    else
+      print("|cffff0000Crit Drop:|r '" .. arg .. "' not found in custom sounds.")
+    end
+  elseif cmd == "listsounds" then
+    local customs = CP.settings.customSounds or {}
+    if #customs == 0 then
+      print("|cffff8000Crit Drop:|r No custom sounds registered.")
+    else
+      print("|cffff8000Crit Drop:|r Custom sounds:")
+      for i, s in ipairs(customs) do
+        print("  " .. i .. ". " .. s)
+      end
+    end
   else
     print("Crit Drop commands:")
-    print("/cp - Toggle settings panel")
-    print("/cp test - Test normal hit")
-    print("/cp testcrit - Test crit hit")
+    print("  /cp — Toggle settings panel")
+    print("  /cp test — Test normal hit")
+    print("  /cp testcrit — Test crit hit")
+    print("  /cp addsound <file.ogg> — Register custom crit sound")
+    print("  /cp removesound <file.ogg> — Remove custom sound")
+    print("  /cp listsounds — List custom sounds")
   end
 end
 
@@ -443,6 +525,7 @@ end
 local function OnAddonLoaded(addonName)
   if addonName == ADDON_NAME then
     CP:Initialize()
+    CP:RebuildSoundList()
     CP.config:CreatePanel()
   end
 end

@@ -16,6 +16,7 @@ CP.settings = {
   abilitiesEnabled = true,
   dotsEnabled = true,
   critSoundId = 1,             -- index into sound list (1=LevelUp, 0=off)
+  customSounds = {},           -- list of custom .ogg filenames
   -- Animation tuning
   bloomRadius = 80,            -- how far overlapping popups spread
   startHeight = 60,            -- drop start distance above landing point
@@ -27,18 +28,39 @@ CP.settings = {
 }
 
 -- Crit sound options (id 0 = off)
--- Sound options using numeric IDs (file paths unreliable in 12.0)
-CP.critSounds = {
-  { name = "Off",            soundID = nil },
-  { name = "Level Up",       soundID = 888 },
-  { name = "Raid Warning",   soundID = 8959 },
-  { name = "PvP Warning",    soundID = 8332 },
-  { name = "Quest Complete",  soundID = 618 },
-  { name = "Loot Coin",      soundID = 120 },
-  { name = "Map Ping",       soundID = 3175 },
-  { name = "Ready Check",    soundID = 8960 },
-  { name = "Bonk",           soundID = 3338 },
+-- Built-in sound options (numeric IDs, reliable in 12.0)
+CP.builtinSounds = {
+  { name = "Off",            soundID = nil,  file = nil },
+  { name = "Level Up",       soundID = 888,  file = nil },
+  { name = "Raid Warning",   soundID = 8959, file = nil },
+  { name = "PvP Warning",    soundID = 8332, file = nil },
+  { name = "Quest Complete",  soundID = 618,  file = nil },
+  { name = "Loot Coin",      soundID = 120,  file = nil },
+  { name = "Map Ping",       soundID = 3175, file = nil },
+  { name = "Ready Check",    soundID = 8960, file = nil },
+  { name = "Bonk",           soundID = 3338, file = nil },
 }
+
+-- Combined sound list (builtins + custom, rebuilt at load)
+CP.critSounds = {}
+
+-- Rebuild the combined sound list from builtins + saved custom sounds
+function CP:RebuildSoundList()
+  self.critSounds = {}
+  -- Add builtins
+  for _, s in ipairs(self.builtinSounds) do
+    table.insert(self.critSounds, s)
+  end
+  -- Add custom sounds from SavedVariables
+  local customs = self.settings.customSounds or {}
+  for _, filename in ipairs(customs) do
+    table.insert(self.critSounds, {
+      name = "* " .. filename,
+      soundID = nil,
+      file = "Interface\\Addons\\CritPopup\\customSounds\\" .. filename,
+    })
+  end
+end
 
 -- Runtime state
 CP.popupQueue = {}            -- Active popups
@@ -208,8 +230,12 @@ function CP:OnDamageDetected(damageAmount, abilityType, indicator, unitTarget, s
   if indicator == "CRITICAL" then
     local soundIdx = self.settings.critSoundId or 1
     local soundEntry = self.critSounds[soundIdx + 1]  -- 0-indexed setting, 1-indexed table
-    if soundEntry and soundEntry.soundID then
-      PlaySound(soundEntry.soundID, "SFX")
+    if soundEntry then
+      if soundEntry.file then
+        PlaySoundFile(soundEntry.file, "SFX")
+      elseif soundEntry.soundID then
+        PlaySound(soundEntry.soundID, "SFX")
+      end
     end
   end
 

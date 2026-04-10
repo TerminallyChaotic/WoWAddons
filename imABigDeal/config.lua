@@ -118,7 +118,7 @@ function IABD:CreateSettingsPanel()
   if self.settingsPanel then return end
 
   local panel = CreateFrame("Frame", "ImABigDealPanel", UIParent)
-  panel:SetSize(350, 500)
+  panel:SetSize(350, 540)
   panel:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
   panel:SetFrameStrata("DIALOG")
   panel:EnableMouse(true)
@@ -379,6 +379,36 @@ function IABD:CreateSettingsPanel()
   end)
   moveBtn:SetScript("OnEnter", function() moveTxt:SetTextColor(1, 0.5, 0) end)
   moveBtn:SetScript("OnLeave", function() moveTxt:SetTextColor(1, 1, 1) end)
+
+  -- Reset to Defaults button
+  y = y - 35
+  local resetBtn = CreateFrame("Button", nil, panel)
+  resetBtn:SetPoint("TOPLEFT", panel, "TOPLEFT", 20, y)
+  resetBtn:SetSize(290, 26)
+  resetBtn:EnableMouse(true)
+  local resetBg = resetBtn:CreateTexture(nil, "BACKGROUND")
+  resetBg:SetAllPoints()
+  resetBg:SetColorTexture(0.15, 0.15, 0.15, 0.9)
+  local resetTxt = resetBtn:CreateFontString(nil, "OVERLAY")
+  resetTxt:SetPoint("CENTER")
+  resetTxt:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+  resetTxt:SetText("Reset All Settings to Defaults")
+  resetBtn:SetScript("OnClick", function()
+    local defaults = {
+      dotEnabled = true, popupEnabled = true, popupDuration = 5,
+      popupMode = "manual", toastX = 0, toastY = -120,
+      minTierDot = 1, minTierPopup = 2,
+      suppressInCombat = true, seenCooldown = 300,
+    }
+    for k, v in pairs(defaults) do
+      IABD.settings[k] = v
+    end
+    IABD:SaveSettings()
+    IABD.ui:UpdateToastPosition()
+    print("|cffff8000I'm A Big Deal:|r Settings reset to defaults. /reload to refresh the panel.")
+  end)
+  resetBtn:SetScript("OnEnter", function() resetTxt:SetTextColor(1, 0.5, 0) end)
+  resetBtn:SetScript("OnLeave", function() resetTxt:SetTextColor(1, 1, 1) end)
 
   panel:Hide()
   self.settingsPanel = panel
