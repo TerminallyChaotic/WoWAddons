@@ -12,7 +12,7 @@ IABD.settings = {
   minTierDot = 1,        -- Minimum tier to show dot (1=Common+)
   minTierPopup = 2,      -- Minimum tier to show popup (2=Uncommon+)
   suppressInCombat = true,
-  seenCooldown = 300,     -- Don't re-popup same NPC for 5 minutes
+  seenCooldown = 60,      -- Don't re-popup same lore entry for 60 seconds
 }
 
 -- Runtime state
@@ -101,26 +101,28 @@ function IABD:OnTargetChanged()
   local tier, title, lore = entry[1], entry[2], entry[3]
   self.currentTargetNPC = npcID
 
-  -- Show portrait dot
+  -- Dot ALWAYS shows on target (no cooldown)
   if self.settings.dotEnabled and tier >= self.settings.minTierDot then
     self.ui:ShowDot(tier)
   end
 
-  -- Show lore popup (if enabled and meets tier threshold)
+  -- Popup respects cooldown (keyed by lore title, not NPC ID)
   if self.settings.popupEnabled and tier >= self.settings.minTierPopup then
     -- Suppress in combat if setting is on
     if self.settings.suppressInCombat and InCombatLockdown() then
       return
     end
 
-    -- Check cooldown (don't re-show recently seen NPCs)
+    -- Cooldown keyed by lore entry title so all "Twilight's Hammer"
+    -- mobs share one cooldown, but different orgs/characters are separate
+    local cooldownKey = title or name
     local now = GetTime()
-    local lastSeen = self.seenNPCs[npcID]
+    local lastSeen = self.seenNPCs[cooldownKey]
     if lastSeen and (now - lastSeen) < self.settings.seenCooldown then
       return
     end
 
-    self.seenNPCs[npcID] = now
+    self.seenNPCs[cooldownKey] = now
     self.ui:ShowToast(name, tier, title, lore, self.settings.popupDuration)
   end
 end

@@ -20,14 +20,15 @@ function UI:CreatePortraitDot()
   local glow = dot:CreateTexture(nil, "BACKGROUND")
   glow:SetPoint("CENTER")
   glow:SetSize(30, 30)
-  glow:SetTexture("Interface\\MINIMAP\\UI-Minimap-Background")
-  glow:SetAlpha(0.35)
+  glow:SetTexture("Interface\\COMMON\\Indicator-Gray")
+  glow:SetAlpha(0.4)
   dot.glow = glow
 
-  -- Main colored circle using the round minimap texture
+  -- Main colored circle — try multiple round textures for 12.0 compat
   local tex = dot:CreateTexture(nil, "ARTWORK")
   tex:SetAllPoints()
-  tex:SetTexture("Interface\\MINIMAP\\UI-Minimap-Background")
+  -- Use raid target icon circle (always available, vertex-colorable)
+  tex:SetTexture("Interface\\COMMON\\Indicator-Yellow")
   dot.texture = tex
 
   -- Tier letter overlay (L, E, R, U, C)
