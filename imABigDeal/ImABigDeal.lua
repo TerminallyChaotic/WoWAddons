@@ -56,11 +56,26 @@ function IABD:LookupNPC(npcID, name)
   end
 
   -- Fallback 2: match by organization/faction pattern in the NPC's name
+  -- Org provides the lore text, but tier comes from the NPC's actual classification
   if name and self.orgPatterns then
     local nameLower = string.lower(name)
     for _, pattern in ipairs(self.orgPatterns) do
       if nameLower:find(pattern[1], 1, true) then
-        return { pattern[2], pattern[3], pattern[4] }
+        -- Determine tier from the NPC's in-game classification, not the org
+        local tier = 2  -- Uncommon default for org members
+        if UnitExists("target") then
+          local classification = UnitClassification("target") or "normal"
+          if classification == "worldboss" then
+            tier = 4
+          elseif classification == "rareelite" then
+            tier = 3
+          elseif classification == "rare" then
+            tier = 3
+          elseif classification == "elite" then
+            tier = 2
+          end
+        end
+        return { tier, pattern[3], pattern[4] }
       end
     end
   end
@@ -172,9 +187,10 @@ function IABD:BuildFallbackEntry(name)
     tier = 2  -- Uncommon
   end
 
-  -- Named NPCs with a subtitle are at least Uncommon
-  -- (generic unnamed mobs stay Common)
-  if subtitle ~= "" and tier < 2 then
+  -- All humanoid/relevant NPCs are at least Uncommon
+  -- Only critters and beasts with no title stay Common
+  local lowValueTypes = { ["Critter"] = true, ["Beast"] = true, ["Non-combat Pet"] = true }
+  if tier < 2 and not lowValueTypes[creatureType] then
     tier = 2
   end
 
