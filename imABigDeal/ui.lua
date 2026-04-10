@@ -12,27 +12,28 @@ function UI:CreatePortraitDot()
   if self.dot then return end
 
   local dot = CreateFrame("Frame", "ImABigDealDot", UIParent)
-  dot:SetSize(20, 20)
-  dot:SetFrameStrata("TOOLTIP")  -- above everything
+  dot:SetSize(22, 22)
+  dot:SetFrameStrata("TOOLTIP")
   dot:SetFrameLevel(100)
 
-  -- Solid colored circle
-  local tex = dot:CreateTexture(nil, "ARTWORK")
-  tex:SetAllPoints()
-  tex:SetColorTexture(1, 1, 1, 1)  -- colored per tier
-  dot.texture = tex
-
-  -- Glow ring
+  -- Outer glow circle (larger, faded)
   local glow = dot:CreateTexture(nil, "BACKGROUND")
   glow:SetPoint("CENTER")
-  glow:SetSize(28, 28)
-  glow:SetColorTexture(1, 1, 1, 0.25)
+  glow:SetSize(30, 30)
+  glow:SetTexture("Interface\\MINIMAP\\UI-Minimap-Background")
+  glow:SetAlpha(0.35)
   dot.glow = glow
+
+  -- Main colored circle using the round minimap texture
+  local tex = dot:CreateTexture(nil, "ARTWORK")
+  tex:SetAllPoints()
+  tex:SetTexture("Interface\\MINIMAP\\UI-Minimap-Background")
+  dot.texture = tex
 
   -- Tier letter overlay (L, E, R, U, C)
   local letter = dot:CreateFontString(nil, "OVERLAY")
   letter:SetPoint("CENTER", 0, 0)
-  letter:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE, THICKOUTLINE")
+  letter:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE, THICKOUTLINE")
   letter:SetTextColor(0, 0, 0)
   dot.letter = letter
 
@@ -74,8 +75,8 @@ function UI:ShowDot(tier)
     self.dot:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 280, -16)
   end
 
-  self.dot.texture:SetColorTexture(color[1], color[2], color[3], 1)
-  self.dot.glow:SetColorTexture(color[1], color[2], color[3], 0.25)
+  self.dot.texture:SetVertexColor(color[1], color[2], color[3], 1)
+  self.dot.glow:SetVertexColor(color[1], color[2], color[3], 0.35)
   self.dot.letter:SetText(tierLetters[tier] or "?")
   self.dot:Show()
 end

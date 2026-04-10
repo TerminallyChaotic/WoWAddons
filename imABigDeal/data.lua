@@ -311,4 +311,80 @@ IABD.nameOverrides = {
   ["harrison jones"]          = { 2, "Adventurer and Archaeologist", "Azeroth's most dashing archaeologist, inspired by a certain whip-wielding movie hero." },
   ["maximillian of northshire"] = { 2, "Delusional Knight", "Believes himself a great paladin in Un'Goro Crater. Mistakes dinosaurs for dragons. Beloved for his unshakeable optimism." },
   ["lorewalker cho"]          = { 2, "Keeper of Pandaren Lore", "Head of the Lorewalkers, a gentle scholar who preserves Pandaren history through stories." },
+
+  -- ============================================================
+  -- EXPANDED: Blood Elf / Silvermoon characters
+  -- ============================================================
+  ["grand magister rommath"]  = { 3, "Grand Magister of Quel'Thalas", "Leader of the Blood Elf magi, fiercely loyal to his people. Studied under Kael'thas in Dalaran and brought arcane knowledge back to rebuild Silvermoon after the Scourge invasion." },
+  ["rommath"]                 = { 3, "Grand Magister of Quel'Thalas", "Leader of the Blood Elf magi, fiercely loyal to his people. Studied under Kael'thas in Dalaran and brought arcane knowledge back to rebuild Silvermoon after the Scourge invasion." },
+  ["halduron brightwing"]     = { 3, "Ranger-General of Silvermoon", "Commander of the Farstriders, the elite ranger order of Quel'Thalas. Took the mantle after Sylvanas's death and Nathanos's departure." },
+  ["arator the redeemer"]     = { 3, "Son of Turalyon and Alleria", "Half-elf paladin, son of two legendary heroes. Spent most of his life believing both parents were dead. Now serves the Army of the Light." },
+  ["arator"]                  = { 3, "Son of Turalyon and Alleria", "Half-elf paladin, son of two legendary heroes. Spent most of his life believing both parents were dead. Now serves the Army of the Light." },
+  ["kael'thas sunstrider"]    = { 4, "The Sun King", "Last of the Sunstrider dynasty, prince of the Blood Elves. Led his people to Outland seeking a cure for their magic addiction, but fell to madness and allied with the Burning Legion." },
+  ["kael'thas"]               = { 4, "The Sun King", "Last of the Sunstrider dynasty, prince of the Blood Elves. Led his people to Outland seeking a cure for their magic addiction, but fell to madness and allied with the Burning Legion." },
+
+  -- ============================================================
+  -- EXPANDED: Alliance notable NPCs
+  -- ============================================================
+  ["mathias shaw"]            = { 3, "Spymaster of SI:7", "Leader of Stormwind's intelligence agency. A master of espionage who was replaced by a Dreadlord impersonator during the Legion invasion." },
+  ["master mathias shaw"]     = { 3, "Spymaster of SI:7", "Leader of Stormwind's intelligence agency. A master of espionage who was replaced by a Dreadlord impersonator during the Legion invasion." },
+  ["lady katherine proudmoore"] = { 3, "Lord Admiral of Kul Tiras", "Mother of Jaina Proudmoore, ruler of Kul Tiras. Blamed Jaina for Daelin's death and exiled her before eventually reconciling during the Fourth War." },
+  ["katherine proudmoore"]    = { 3, "Lord Admiral of Kul Tiras", "Mother of Jaina Proudmoore, ruler of Kul Tiras. Blamed Jaina for Daelin's death and exiled her before eventually reconciling during the Fourth War." },
+  ["moira thaurissan"]        = { 3, "Queen of the Dark Iron", "Daughter of Magni Bronzebeard, married the Dark Iron Emperor and bore his heir. Now sits on the Council of Three Hammers representing the Dark Iron clan." },
+  ["high exarch yrel"]        = { 3, "Champion of Draenor", "Draenei paladin who rose from a timid refugee to the greatest champion of alternate Draenor. Became the leader of the Lightbound, forcibly converting orcs to the Light." },
+  ["yrel"]                    = { 3, "Champion of Draenor", "Draenei paladin who rose from a timid refugee to the greatest champion of alternate Draenor. Became the leader of the Lightbound, forcibly converting orcs to the Light." },
+
+  -- ============================================================
+  -- EXPANDED: Horde notable NPCs
+  -- ============================================================
+  ["rokhan"]                  = { 3, "Shadow Hunter of the Darkspear", "Veteran troll shadow hunter, served under Vol'jin and Thrall. Became the Horde's representative on the Horde Council after Sylvanas's departure." },
+  ["first arcanist thalyssra"] = { 4, "First Arcanist of Suramar", "Led the Nightborne rebellion against Elisande's alliance with the Burning Legion. Freed Suramar and brought her people into the Horde." },
+  ["geya'rah"]                = { 3, "Overlord of the Mag'har", "Daughter of alternate-Durotan and Draka from Draenor. Led the Mag'har orcs to Azeroth to escape Yrel's forced Light conversion." },
+  ["ji firepaw"]              = { 3, "Huojin Representative", "Leader of the Huojin Pandaren who joined the Horde. A passionate warrior from the Wandering Isle." },
+  ["aysa cloudsinger"]        = { 3, "Tushui Representative", "Leader of the Tushui Pandaren who joined the Alliance. Values patience, wisdom, and careful thought." },
+  ["gazlowe"]                 = { 3, "Trade Prince of the Bilgewater Cartel", "The goblin who replaced Gallywix. Actually competent and relatively honest — by goblin standards. Built half the Horde's infrastructure." },
+  ["boss mida"]               = { 2, "Goblin Entrepreneur", "One of the most successful goblin businesswomen in Orgrimmar. Runs operations in the Goblin Slums and is one of Gallywix's chief rivals." },
+
+  -- ============================================================
+  -- EXPANDED: Dragonflight characters
+  -- ============================================================
+  ["vyranoth"]                = { 4, "Incarnate of the Frost", "One of the Primal Incarnates imprisoned by the Titans. After her release, she eventually chose to ally with the Dragon Aspects against Fyrakk." },
+  ["fyrakk"]                  = { 4, "Incarnate of Shadowflame", "One of the Primal Incarnates, embodiment of fire and fury. Sought to corrupt the World Tree Amirdrassil with shadowflame before being defeated." },
+  ["sabellian"]               = { 3, "Son of Deathwing", "A Black Dragon who fled to Outland and remained uncorrupted. Returned to the Dragon Isles to compete with Wrathion for leadership of the Black Dragonflight." },
+  ["senegos"]                 = { 2, "Ancient Blue Dragon", "One of the oldest living Blue Dragons, slowly dying of age in Azsuna. Mentor and guardian who aided adventurers despite his fading strength." },
+
+  -- ============================================================
+  -- EXPANDED: Villains and bosses
+  -- ============================================================
+  ["deathwing"]               = { 5, "The Destroyer", "Neltharion the Earth-Warder, driven mad by the Old Gods' whispers. Shattered Azeroth during the Cataclysm before being destroyed by the Dragon Aspects and mortal champions." },
+  ["neltharion"]              = { 5, "The Earth-Warder", "Original Aspect of the Black Dragonflight before his corruption. Created the Dragon Soul to enslave the other flights. Became the monster known as Deathwing." },
+  ["sargeras"]                = { 5, "The Dark Titan", "Once the champion of the Pantheon, driven mad by witnessing the Void's corruption. Created the Burning Legion to scour all life from the universe rather than let it fall to the Void." },
+  ["queen azshara"]           = { 4, "Queen of the Naga", "Once the most beautiful and powerful ruler of the Night Elf empire. Her pact with N'Zoth transformed her people into Naga. Rules from her sunken palace of Nazjatar." },
+  ["azshara"]                 = { 4, "Queen of the Naga", "Once the most beautiful and powerful ruler of the Night Elf empire. Her pact with N'Zoth transformed her people into Naga. Rules from her sunken palace of Nazjatar." },
+  ["n'zoth"]                  = { 4, "The Corruptor", "Last of the Old Gods active on Azeroth. Master of deception and madness, pulled the strings behind countless schemes before being destroyed by the Heart of Azeroth." },
+  ["gul'dan"]                 = { 4, "Darkness Incarnate", "The orc warlock who first offered the Horde to the Burning Legion. His skull became a weapon of immense power. An alternate version repeated his treachery on Draenor." },
+  ["ragnaros"]                = { 3, "The Firelord", "Elemental Lord of Fire, servant of the Old Gods. Summoned into Blackrock Mountain by the Dark Iron dwarves, later defeated permanently in the Firelands." },
+  ["ragnaros the firelord"]   = { 3, "The Firelord", "Elemental Lord of Fire, servant of the Old Gods. Summoned into Blackrock Mountain by the Dark Iron dwarves, later defeated permanently in the Firelands." },
+  ["kel'thuzad"]              = { 3, "Archlich of Naxxramas", "Former mage of the Kirin Tor who became Arthas's most loyal servant. Commanded Naxxramas and orchestrated the Plague of Undeath across Lordaeron." },
+  ["lei shen"]                = { 3, "The Thunder King", "Mogu emperor who stole the power of the Titans. United the Mogu Empire through tyranny and enslaved the Pandaren for millennia before his defeat." },
+  ["the thunder king"]        = { 3, "The Thunder King", "Mogu emperor who stole the power of the Titans. United the Mogu Empire through tyranny and enslaved the Pandaren for millennia before his defeat." },
+  ["denathrius"]              = { 3, "Sire of Revendreth", "The original vampire, ruler of Revendreth in the Shadowlands. Secretly allied with the Jailer and hoarded anima while his realm starved." },
+  ["sire denathrius"]         = { 3, "Sire of Revendreth", "The original vampire, ruler of Revendreth in the Shadowlands. Secretly allied with the Jailer and hoarded anima while his realm starved." },
+
+  -- ============================================================
+  -- EXPANDED: Classic / beloved NPCs
+  -- ============================================================
+  ["tirion fordring"]         = { 4, "Highlord of the Argent Crusade", "Exiled paladin who befriended the orc Eitrigg. Took up the Ashbringer to lead the assault on Icecrown Citadel. Shattered Frostmourne and freed Arthas's soul." },
+  ["highlord tirion fordring"] = { 4, "Highlord of the Argent Crusade", "Exiled paladin who befriended the orc Eitrigg. Took up the Ashbringer to lead the assault on Icecrown Citadel. Shattered Frostmourne and freed Arthas's soul." },
+  ["uther the lightbringer"]  = { 4, "First Paladin", "The first of the Knights of the Silver Hand, mentor to Arthas. Murdered by his own student at Andorhal. His soul was split between Bastion and the Maw in the Shadowlands." },
+  ["uther"]                   = { 4, "First Paladin", "The first of the Knights of the Silver Hand, mentor to Arthas. Murdered by his own student at Andorhal. His soul was split between Bastion and the Maw in the Shadowlands." },
+  ["cenarius"]                = { 4, "Lord of the Forest", "Demigod son of Elune and Malorne, father of druidism. Taught Malfurion the ways of nature. Killed by Grom Hellscream, later restored in the Emerald Dream." },
+  ["medivh"]                  = { 4, "The Last Guardian", "The final Guardian of Tirisfal, corrupted by Sargeras before birth. Opened the Dark Portal that brought the Horde to Azeroth. Later returned as a prophet to warn of the Burning Legion." },
+  ["ysera"]                   = { 4, "The Dreamer", "Aspect of the Green Dragonflight, guardian of the Emerald Dream. Corrupted by the Emerald Nightmare and slain by Tyrande, her spirit found peace among the stars of Ardenweald." },
+  ["cairne bloodhoof"]        = { 3, "High Chieftain of the Tauren", "Father of Baine, one of Thrall's most trusted allies. Killed in a Mak'gora against Garrosh when the young Warchief's weapon was secretly poisoned by the Grimtotem." },
+  ["saurfang"]                = { 3, "High Overlord of the Horde", "Legendary orc warrior who fought in every Horde conflict since the First War. Died challenging Sylvanas in Mak'gora before Orgrimmar." },
+  ["hogger"]                  = { 2, "Terror of Elwynn Forest", "A gnoll riverpaw leader who has been terrorizing low-level Alliance players since 2004. The most infamous level 11 elite in WoW history." },
+  ["linken"]                  = { 2, "Adventurer of Un'Goro", "A gnome found in Un'Goro Crater with a fairy companion and amnesia. His entire questline is an elaborate homage to The Legend of Zelda." },
+  ["mylune"]                  = { 2, "Guardian of the Small", "A dryad in Hyjal obsessed with saving tiny woodland creatures. Known for her over-the-top enthusiasm for anything cute and furry." },
+  ["chromie"]                 = { 4, "Ambassador of the Bronze Dragonflight", "A Bronze dragon who prefers gnome form. Guardian of the timeways, helping adventurers navigate temporal crises." },
 }
