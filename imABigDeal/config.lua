@@ -17,15 +17,7 @@ SlashCmdList["IMABIGDEAL"] = function(msg)
     local query = msg:sub(8)
     IABD:LookupByName(query)
   elseif msg == "collection" or msg == "pokedex" or msg == "stats" then
-    local total = IABD:GetDiscoveryCount()
-    local byTier = IABD:GetDiscoveryByTier()
-    print("|cffff8000I'm A Big Deal — Discovery Collection|r")
-    print("  Total discovered: |cff00ff00" .. total .. "|r")
-    print("  |cffff8000Legendary:|r " .. byTier[5])
-    print("  |cffa335eeEpic:|r " .. byTier[4])
-    print("  |cff0070ddRare:|r " .. byTier[3])
-    print("  |cff1eff00Uncommon:|r " .. byTier[2])
-    print("  |cffffffffCommon:|r " .. byTier[1])
+    IABD.ui:ToggleCollection()
   elseif msg == "export" then
     IABD:ExportUnknownNPCs()
   elseif msg == "debug" then

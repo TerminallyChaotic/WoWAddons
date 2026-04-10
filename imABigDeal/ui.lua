@@ -583,3 +583,244 @@ function UI:ShowExpandedView()
 
   self.expanded:Show()
 end
+
+-- ============================================================
+-- Collection Browser (Pokédex)
+-- ============================================================
+
+function UI:CreateCollectionBrowser()
+  if self.collection then return end
+
+  local panel = CreateFrame("Frame", "ImABigDealCollection", UIParent)
+  panel:SetSize(450, 500)
+  panel:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+  panel:SetFrameStrata("DIALOG")
+  panel:EnableMouse(true)
+  panel:SetMovable(true)
+  panel:RegisterForDrag("LeftButton")
+  panel:SetScript("OnDragStart", panel.StartMoving)
+  panel:SetScript("OnDragStop", panel.StopMovingOrSizing)
+
+  -- Background
+  local bg = panel:CreateTexture(nil, "BACKGROUND")
+  bg:SetAllPoints()
+  bg:SetColorTexture(0.03, 0.03, 0.06, 0.95)
+
+  -- Top bar
+  local topBar = panel:CreateTexture(nil, "ARTWORK")
+  topBar:SetPoint("TOPLEFT", 0, 0)
+  topBar:SetPoint("TOPRIGHT", 0, 0)
+  topBar:SetHeight(4)
+  topBar:SetColorTexture(1, 0.5, 0, 1)
+
+  -- Borders
+  local borderL = panel:CreateTexture(nil, "BORDER")
+  borderL:SetPoint("TOPLEFT", -1, 1)
+  borderL:SetPoint("BOTTOMLEFT", -1, -1)
+  borderL:SetWidth(1)
+  borderL:SetColorTexture(0.4, 0.4, 0.4, 0.5)
+  local borderR = panel:CreateTexture(nil, "BORDER")
+  borderR:SetPoint("TOPRIGHT", 1, 1)
+  borderR:SetPoint("BOTTOMRIGHT", 1, -1)
+  borderR:SetWidth(1)
+  borderR:SetColorTexture(0.4, 0.4, 0.4, 0.5)
+  local borderB = panel:CreateTexture(nil, "BORDER")
+  borderB:SetPoint("BOTTOMLEFT", -1, -1)
+  borderB:SetPoint("BOTTOMRIGHT", 1, -1)
+  borderB:SetHeight(1)
+  borderB:SetColorTexture(0.4, 0.4, 0.4, 0.5)
+
+  -- Title
+  local title = panel:CreateFontString(nil, "OVERLAY")
+  title:SetPoint("TOP", 0, -12)
+  title:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE, THICKOUTLINE")
+  title:SetText("|cffff8000Lore Collection|r")
+
+  -- Close button
+  local closeBtn = CreateFrame("Button", nil, panel)
+  closeBtn:SetPoint("TOPRIGHT", -8, -8)
+  closeBtn:SetSize(20, 20)
+  local closeTxt = closeBtn:CreateFontString(nil, "OVERLAY")
+  closeTxt:SetPoint("CENTER")
+  closeTxt:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE")
+  closeTxt:SetText("X")
+  closeTxt:SetTextColor(0.8, 0.2, 0.2)
+  closeBtn:SetScript("OnClick", function() panel:Hide() end)
+
+  -- Stats bar
+  local statsText = panel:CreateFontString(nil, "OVERLAY")
+  statsText:SetPoint("TOPLEFT", 20, -35)
+  statsText:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+  panel.statsText = statsText
+
+  -- Tier filter buttons
+  local filterY = -55
+  local filterLabel = panel:CreateFontString(nil, "OVERLAY")
+  filterLabel:SetPoint("TOPLEFT", 20, filterY)
+  filterLabel:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+  filterLabel:SetText("Filter:")
+  filterLabel:SetTextColor(0.6, 0.6, 0.6)
+
+  panel.currentFilter = 0  -- 0 = all
+  local filterNames = { "All", "Legendary", "Epic", "Rare", "Uncommon", "Common" }
+  local filterTiers = { 0, 5, 4, 3, 2, 1 }
+  local filterColors = {
+    { 1, 1, 1 }, { 1, 0.5, 0 }, { 0.64, 0.21, 0.93 },
+    { 0, 0.44, 0.87 }, { 0.12, 1, 0 }, { 1, 1, 1 },
+  }
+  panel.filterButtons = {}
+
+  for i, fname in ipairs(filterNames) do
+    local fb = CreateFrame("Button", nil, panel)
+    fb:SetPoint("TOPLEFT", 60 + (i - 1) * 62, filterY + 3)
+    fb:SetSize(58, 16)
+    fb:EnableMouse(true)
+
+    local fbBg = fb:CreateTexture(nil, "BACKGROUND")
+    fbBg:SetAllPoints()
+    fbBg:SetColorTexture(0.15, 0.15, 0.15, 0.8)
+    fb.bg = fbBg
+
+    local fbTxt = fb:CreateFontString(nil, "OVERLAY")
+    fbTxt:SetPoint("CENTER")
+    fbTxt:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+    fbTxt:SetText(fname)
+    fbTxt:SetTextColor(filterColors[i][1], filterColors[i][2], filterColors[i][3])
+
+    fb:SetScript("OnClick", function()
+      panel.currentFilter = filterTiers[i]
+      UI:RefreshCollection()
+    end)
+
+    panel.filterButtons[i] = fb
+  end
+
+  -- Scrollable content area
+  local scrollFrame = CreateFrame("ScrollFrame", nil, panel)
+  scrollFrame:SetPoint("TOPLEFT", 10, -75)
+  scrollFrame:SetPoint("BOTTOMRIGHT", -10, 10)
+  panel.scrollFrame = scrollFrame
+
+  local content = CreateFrame("Frame", nil, scrollFrame)
+  content:SetSize(430, 1)  -- height set dynamically
+  scrollFrame:SetScrollChild(content)
+  panel.content = content
+  panel.entryFrames = {}
+
+  -- Mouse wheel scrolling
+  panel.scrollOffset = 0
+  panel:SetScript("OnMouseWheel", function(self, delta)
+    self.scrollOffset = math.max(0, self.scrollOffset - delta * 30)
+    scrollFrame:SetVerticalScroll(self.scrollOffset)
+  end)
+
+  panel:Hide()
+  self.collection = panel
+end
+
+function UI:RefreshCollection()
+  if not self.collection then return end
+  local panel = self.collection
+
+  -- Get stats
+  local total = IABD:GetDiscoveryCount()
+  local byTier = IABD:GetDiscoveryByTier()
+
+  panel.statsText:SetText(
+    "|cff00ff00" .. total .. "|r discovered  —  " ..
+    "|cffff8000" .. byTier[5] .. "|r L  " ..
+    "|cffa335ee" .. byTier[4] .. "|r E  " ..
+    "|cff0070dd" .. byTier[3] .. "|r R  " ..
+    "|cff1eff00" .. byTier[2] .. "|r U  " ..
+    "|cffffffff" .. byTier[1] .. "|r C"
+  )
+
+  -- Clear old entries
+  for _, frame in ipairs(panel.entryFrames) do
+    frame:Hide()
+  end
+  panel.entryFrames = {}
+
+  -- Build sorted list
+  local entries = {}
+  for name, data in pairs(IABD.discovered) do
+    if panel.currentFilter == 0 or data.tier == panel.currentFilter then
+      table.insert(entries, { name = name, tier = data.tier, title = data.title, count = data.count or 1 })
+    end
+  end
+
+  -- Sort: tier descending, then name alphabetical
+  table.sort(entries, function(a, b)
+    if a.tier ~= b.tier then return a.tier > b.tier end
+    return a.name < b.name
+  end)
+
+  -- Create entry rows
+  local rowHeight = 24
+  local y = 0
+
+  for i, entry in ipairs(entries) do
+    local color = IABD.tierColors[entry.tier] or { 1, 1, 1 }
+    local tierLetter = ({ [5] = "L", [4] = "E", [3] = "R", [2] = "U", [1] = "C" })[entry.tier] or "?"
+
+    local row = CreateFrame("Frame", nil, panel.content)
+    row:SetPoint("TOPLEFT", 0, -y)
+    row:SetSize(410, rowHeight)
+
+    -- Alternating row background
+    if i % 2 == 0 then
+      local rowBg = row:CreateTexture(nil, "BACKGROUND")
+      rowBg:SetAllPoints()
+      rowBg:SetColorTexture(0.1, 0.1, 0.1, 0.3)
+    end
+
+    -- Tier dot
+    local dot = row:CreateFontString(nil, "OVERLAY")
+    dot:SetPoint("LEFT", 5, 0)
+    dot:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+    dot:SetText("[" .. tierLetter .. "]")
+    dot:SetTextColor(color[1], color[2], color[3])
+
+    -- Name
+    local nameText = row:CreateFontString(nil, "OVERLAY")
+    nameText:SetPoint("LEFT", 30, 0)
+    nameText:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+    nameText:SetText(entry.name)
+    nameText:SetTextColor(color[1], color[2], color[3])
+
+    -- Title (dimmed)
+    if entry.title and entry.title ~= "" then
+      local titleText = row:CreateFontString(nil, "OVERLAY")
+      titleText:SetPoint("LEFT", nameText, "RIGHT", 8, 0)
+      titleText:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+      titleText:SetText("— " .. entry.title)
+      titleText:SetTextColor(0.5, 0.5, 0.5)
+    end
+
+    -- Seen count (right side)
+    local countText = row:CreateFontString(nil, "OVERLAY")
+    countText:SetPoint("RIGHT", -10, 0)
+    countText:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+    countText:SetText("x" .. entry.count)
+    countText:SetTextColor(0.4, 0.4, 0.4)
+
+    table.insert(panel.entryFrames, row)
+    y = y + rowHeight
+  end
+
+  -- Update content height for scrolling
+  panel.content:SetHeight(math.max(1, y))
+  panel.scrollOffset = 0
+  panel.scrollFrame:SetVerticalScroll(0)
+end
+
+function UI:ToggleCollection()
+  if not self.collection then self:CreateCollectionBrowser() end
+
+  if self.collection:IsShown() then
+    self.collection:Hide()
+  else
+    self:RefreshCollection()
+    self.collection:Show()
+  end
+end
