@@ -8,53 +8,37 @@ local UI = IABD.ui
 -- Portrait Rarity Dot
 -- ============================================================
 
+-- Custom tier gem textures
+local tierTextures = {
+  [1] = "Interface\\AddOns\\ImABigDeal\\textures\\Common",
+  [2] = "Interface\\AddOns\\ImABigDeal\\textures\\Uncommon",
+  [3] = "Interface\\AddOns\\ImABigDeal\\textures\\Rare",
+  [4] = "Interface\\AddOns\\ImABigDeal\\textures\\Epic",
+  [5] = "Interface\\AddOns\\ImABigDeal\\textures\\Legendary",
+}
+
 function UI:CreatePortraitDot()
   if self.dot then return end
 
   local dot = CreateFrame("Frame", "ImABigDealDot", UIParent)
-  dot:SetSize(24, 24)
+  dot:SetSize(28, 28)
   dot:SetFrameStrata("TOOLTIP")
   dot:SetFrameLevel(100)
 
-  -- Glow (larger, faded circle behind the main dot)
-  local glow = dot:CreateTexture(nil, "BACKGROUND")
-  glow:SetPoint("CENTER")
-  glow:SetSize(34, 34)
-  glow:SetTexture("Interface\\CHARACTERFRAME\\TempPortraitAlphaMask")
-  glow:SetAlpha(0.35)
-  dot.glow = glow
-
-  -- Dark border ring
-  local ring = dot:CreateTexture(nil, "BORDER")
-  ring:SetPoint("CENTER")
-  ring:SetSize(28, 28)
-  ring:SetTexture("Interface\\CHARACTERFRAME\\TempPortraitAlphaMask")
-  ring:SetVertexColor(0, 0, 0, 0.8)
-  dot.ring = ring
-
-  -- Main colored circle (portrait mask = guaranteed round texture)
-  local circle = dot:CreateTexture(nil, "ARTWORK")
-  circle:SetAllPoints()
-  circle:SetTexture("Interface\\CHARACTERFRAME\\TempPortraitAlphaMask")
-  dot.circle = circle
-
-  -- Tier letter overlay
-  local letter = dot:CreateFontString(nil, "OVERLAY")
-  letter:SetPoint("CENTER", 0, 0)
-  letter:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE, THICKOUTLINE")
-  dot.letter = letter
+  -- Custom gem texture
+  local gem = dot:CreateTexture(nil, "ARTWORK")
+  gem:SetAllPoints()
+  dot.gem = gem
 
   dot:Hide()
   self.dot = dot
 end
 
-local tierLetters = { [5] = "L", [4] = "E", [3] = "R", [2] = "U", [1] = "C" }
-
 function UI:ShowDot(tier)
   if not self.dot then self:CreatePortraitDot() end
 
-  local color = IABD.tierColors[tier]
-  if not color then
+  local texturePath = tierTextures[tier]
+  if not texturePath then
     self.dot:Hide()
     return
   end
@@ -66,8 +50,6 @@ function UI:ShowDot(tier)
   local targetFrame = _G["TargetFrame"]
 
   if targetFrame then
-    -- Try to anchor near the portrait (top-left area of the target frame)
-    -- TargetFrame's portrait is roughly at the left side
     local ok = pcall(function()
       self.dot:SetPoint("TOPLEFT", targetFrame, "TOPLEFT", 6, -6)
     end)
@@ -75,22 +57,11 @@ function UI:ShowDot(tier)
   end
 
   if not anchored then
-    -- Fallback: fixed position where target frame usually sits
     self.dot:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 280, -30)
   end
 
-  -- Color the circle
-  self.dot.circle:SetVertexColor(color[1], color[2], color[3], 1)
-  self.dot.glow:SetVertexColor(color[1], color[2], color[3], 0.35)
-
-  -- Letter in contrasting color (dark on bright, white on dark)
-  local brightness = color[1] * 0.3 + color[2] * 0.6 + color[3] * 0.1
-  if brightness > 0.5 then
-    self.dot.letter:SetTextColor(0, 0, 0)
-  else
-    self.dot.letter:SetTextColor(1, 1, 1)
-  end
-  self.dot.letter:SetText(tierLetters[tier] or "?")
+  -- Set the custom gem texture for this tier
+  self.dot.gem:SetTexture(texturePath)
   self.dot:Show()
 end
 
