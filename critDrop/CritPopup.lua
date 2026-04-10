@@ -24,7 +24,8 @@ CP.settings = {
   normalFontSize = 48,         -- font size for normal hits
   critFontSize = 72,           -- font size for crits
   animIntensity = 1.0,         -- multiplier for bounce/drift (0.5-2.0)
-  digitSpacing = 5,            -- pixels between digits
+  normalDigitSpacing = 0,      -- pixels between digits (normal hits)
+  critDigitSpacing = 5,        -- pixels between digits (crits)
 }
 
 -- Crit sound options (id 0 = off)

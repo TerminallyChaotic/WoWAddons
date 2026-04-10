@@ -95,7 +95,7 @@ function Anim:CreatePopupFrame(damageAmount, targetName)
   local damageStr = tostring(damageAmount)
 
   local digitWidth = 40
-  local spacing = CP.settings.digitSpacing or 5
+  local spacing = 5  -- default, recalculated in PlaySequence based on crit
   local totalWidth = (#damageStr * digitWidth) + ((#damageStr - 1) * spacing)
 
   local parentFrame = CreateFrame("Frame", nil, UIParent)
@@ -255,10 +255,21 @@ function Anim:PlaySequence(parentFrame, durationSeconds)
   parentFrame.bloomOffsetY = bloomY
   parentFrame.bloomId = bloomId
 
-  -- Apply color and sizing from settings
+  -- Apply color, sizing, and spacing from settings
   local color = parentFrame.textColor or {1, 1, 1, 1}
-  local fontSize = parentFrame.isCrit and (CP.settings.critFontSize or 72) or (CP.settings.normalFontSize or 48)
-  for _, digitFrame in ipairs(parentFrame.digitFrames) do
+  local isCrit = parentFrame.isCrit
+  local fontSize = isCrit and (CP.settings.critFontSize or 72) or (CP.settings.normalFontSize or 48)
+  local spacing = isCrit and (CP.settings.critDigitSpacing or 5) or (CP.settings.normalDigitSpacing or 0)
+  local digitWidth = 40
+
+  -- Reposition digits with correct spacing for crit vs normal
+  local totalWidth = (digitCount * digitWidth) + ((digitCount - 1) * spacing)
+  parentFrame:SetWidth(totalWidth)
+  for i, digitFrame in ipairs(parentFrame.digitFrames) do
+    local xOffset = (i - 1) * (digitWidth + spacing)
+    digitFrame.xOffset = xOffset
+    digitFrame:ClearAllPoints()
+    digitFrame:SetPoint("LEFT", parentFrame, "LEFT", xOffset, 0)
     digitFrame.text:SetFont("Fonts\\FRIZQT__.TTF", fontSize, "OUTLINE, THICKOUTLINE")
     digitFrame.text:SetTextColor(color[1], color[2], color[3], color[4])
   end

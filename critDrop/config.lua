@@ -69,7 +69,7 @@ function Config:CreatePanel()
   if CP.settingsPanel then return end
 
   local panel = CreateFrame("Frame", "CritPopupPanel", UIParent)
-  panel:SetSize(400, 790)
+  panel:SetSize(400, 840)
   panel:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
   panel:SetFrameStrata("DIALOG")
   panel:EnableMouse(true)
@@ -136,7 +136,8 @@ function Config:CreatePanel()
 
   _, y = CreateSlider(panel, y, "Normal Damage Size", 24, 96, 2, "normalFontSize", "%.0f")
   _, y = CreateSlider(panel, y, "Crit Damage Size", 36, 120, 2, "critFontSize", "%.0f")
-  _, y = CreateSlider(panel, y, "Digit Spacing (px)", 0, 30, 1, "digitSpacing", "%.0f")
+  _, y = CreateSlider(panel, y, "Normal Digit Spacing", -10, 30, 1, "normalDigitSpacing", "%.0f")
+  _, y = CreateSlider(panel, y, "Crit Digit Spacing", -10, 30, 1, "critDigitSpacing", "%.0f")
   _, y = CreateSlider(panel, y, "Drop Height (px)", 20, 150, 5, "startHeight", "%.0f")
   _, y = CreateSlider(panel, y, "Animation Intensity", 0.3, 2.5, 0.1, "animIntensity", "%.1fx")
   _, y = CreateSlider(panel, y, "Display Duration (sec)", 0.5, 3.0, 0.1, "durationSeconds", "%.1fs")
@@ -343,7 +344,8 @@ function Config:CreatePanel()
       durationSeconds = 1.5, autoAttacksEnabled = true, abilitiesEnabled = true,
       dotsEnabled = true, critSoundId = 1, customSounds = {},
       bloomRadius = 80, startHeight = 60, nameplateOffset = 30,
-      normalFontSize = 48, critFontSize = 72, animIntensity = 1.0, digitSpacing = 5,
+      normalFontSize = 48, critFontSize = 72, animIntensity = 1.0,
+      normalDigitSpacing = 0, critDigitSpacing = 5,
     }
     for k, v in pairs(defaults) do
       CP.settings[k] = v
@@ -399,7 +401,8 @@ function Config:SaveSettings()
     normalFontSize = CP.settings.normalFontSize,
     critFontSize = CP.settings.critFontSize,
     animIntensity = CP.settings.animIntensity,
-    digitSpacing = CP.settings.digitSpacing,
+    normalDigitSpacing = CP.settings.normalDigitSpacing,
+    critDigitSpacing = CP.settings.critDigitSpacing,
     customSounds = CP.settings.customSounds,
   }
 end
@@ -429,7 +432,8 @@ function Config:LoadSettings()
     CP.settings.normalFontSize = saved.normalFontSize or CP.settings.normalFontSize
     CP.settings.critFontSize = saved.critFontSize or CP.settings.critFontSize
     CP.settings.animIntensity = saved.animIntensity or CP.settings.animIntensity
-    CP.settings.digitSpacing = saved.digitSpacing or CP.settings.digitSpacing
+    CP.settings.normalDigitSpacing = saved.normalDigitSpacing or CP.settings.normalDigitSpacing
+    CP.settings.critDigitSpacing = saved.critDigitSpacing or CP.settings.critDigitSpacing
     CP.settings.customSounds = saved.customSounds or CP.settings.customSounds
   end
 end
