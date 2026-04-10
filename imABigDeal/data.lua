@@ -388,3 +388,71 @@ IABD.nameOverrides = {
   ["mylune"]                  = { 2, "Guardian of the Small", "A dryad in Hyjal obsessed with saving tiny woodland creatures. Known for her over-the-top enthusiasm for anything cute and furry." },
   ["chromie"]                 = { 4, "Ambassador of the Bronze Dragonflight", "A Bronze dragon who prefers gnome form. Guardian of the timeways, helping adventurers navigate temporal crises." },
 }
+
+-- Organization/faction pattern matching
+-- If an NPC's name contains a keyword, show the org lore
+-- Checked as fallback when no individual character match found
+-- Format: { "keyword", tier, "Org Name", "Lore blurb" }
+IABD.orgPatterns = {
+  -- Major cosmic forces
+  { "burning legion",     4, "The Burning Legion", "An infinite army of demons created by the fallen Titan Sargeras to scour all life from the universe. Responsible for the Sundering, the Horde's corruption, and three major invasions of Azeroth." },
+  { "scourge",            4, "The Scourge", "An undead army originally created by the Burning Legion as a weapon against Azeroth. Commanded by the Lich King from Icecrown Citadel, the Scourge devastated Lordaeron and nearly consumed the world." },
+  { "old god",            4, "The Old Gods", "Eldritch cosmic horrors imprisoned beneath Azeroth by the Titans. C'Thun, Yogg-Saron, N'Zoth, and Y'Shaarj whispered madness into the minds of mortals and corrupted the Black Dragonflight." },
+
+  -- Major villain factions
+  { "twilight",           3, "Twilight's Hammer", "A nihilistic cult devoted to the Old Gods and the destruction of all life. Originally an orc clan, they were transformed into a doomsday cult by Cho'gall and served Deathwing during the Cataclysm." },
+  { "scarlet",            3, "Scarlet Crusade", "A fanatical order of zealots dedicated to eradicating the undead — and anyone they suspect of being sympathetic to them. Their paranoia made them nearly as dangerous as the Scourge itself." },
+  { "defias",             3, "Defias Brotherhood", "A criminal organization led by Edwin VanCleef. Originally the stonemasons who rebuilt Stormwind, they turned to crime after the nobles refused to pay them." },
+  { "iron horde",         3, "The Iron Horde", "An alternate-timeline Horde created when Garrosh traveled to Draenor and convinced Grom to reject the Blood of Mannoroth. An industrial war machine that invaded Azeroth." },
+  { "mogu",               3, "The Mogu", "Ancient titan-forged turned flesh who ruled Pandaria as brutal tyrants, enslaving the Pandaren for millennia. Their thunder king Lei Shen stole the power of a Titan Keeper." },
+  { "mantid",             3, "The Mantid", "An insectoid race of Pandaria that worships the Old God Y'Shaarj. Every century they swarm in a devastating assault that the Pandaren's Great Wall was built to repel." },
+  { "naga",               3, "The Naga", "Former Highborne night elves transformed by Queen Azshara's pact with the Old God N'Zoth during the Sundering. They dwell in the seas and serve their queen from Nazjatar." },
+  { "qiraji",             3, "The Qiraji", "Insectoid servants of the Old God C'Thun, imprisoned behind the Scarab Wall in Silithus. The opening of Ahn'Qiraj was one of WoW's most iconic world events." },
+  { "nerub",              3, "The Nerubians", "An ancient spider-like race that built a vast underground empire called Azjol-Nerub beneath Northrend. The Lich King waged war against them and raised many as undead." },
+  { "sha ",               3, "The Sha", "Physical manifestations of negative emotions unleashed when the Old God Y'Shaarj was killed, leaving behind its dark essence across Pandaria." },
+  { "primalist",          3, "The Primalists", "Proto-dragon followers of the Primal Incarnates who reject the Titan-imposed order of the Dragon Aspects. They seek to return the world to its primal state." },
+
+  -- Troll empires
+  { "zandalari",          3, "The Zandalari Empire", "The oldest and most powerful troll civilization, rulers of the golden city of Dazar'alor. The progenitor race from which all other troll tribes descended." },
+  { "amani",              3, "The Amani Tribe", "Forest trolls of Zul'Aman. Ancient enemies of the high elves of Quel'Thalas, they have waged war against elven civilization for thousands of years." },
+  { "gurubashi",          3, "The Gurubashi Tribe", "Jungle trolls of Stranglethorn Vale, centered on Zul'Gurub. Their worship of the blood god Hakkar led to their empire's downfall." },
+  { "drakkari",           3, "The Drakkari Tribe", "Ice trolls of Northrend who sacrificed their own loa gods for power against the Scourge — and it wasn't enough." },
+  { "farraki",            3, "The Farraki Tribe", "Sand trolls of Tanaris who once built the mighty city of Zul'Farrak in the desert. Driven to desperation by the encroaching sands." },
+
+  -- Dragonflights
+  { "black dragon",       3, "Black Dragonflight", "Once the Earthwarders, corrupted by the Old Gods through Neltharion who became Deathwing. Nearly destroyed before being reborn in the Dragon Isles." },
+  { "blue dragon",        3, "Blue Dragonflight", "Guardians of magic, led by Malygos then Kalecgos. Nearly destroyed when Malygos's madness led him to wage war on mortal spellcasters." },
+  { "red dragon",         3, "Red Dragonflight", "Protectors of all life, led by Alexstrasza. Enslaved by the Dragonmaw orcs during the Second War, enduring immense suffering." },
+  { "green dragon",       3, "Green Dragonflight", "Guardians of the Emerald Dream, led by Ysera then Merithra. Nearly lost to the Emerald Nightmare." },
+  { "bronze dragon",      3, "Bronze Dragonflight", "Watchers of time itself, led by Nozdormu. They patrol the timeways against those who would alter history." },
+  { "infinite dragon",    3, "Infinite Dragonflight", "Corrupted Bronze Dragons led by Murozond — the future version of Nozdormu. They seek to alter the timeline." },
+
+  -- Player-allied organizations
+  { "kirin tor",          2, "The Kirin Tor", "An elite order of mages based in the floating city of Dalaran. They serve as neutral peacekeepers and guardians of dangerous magical knowledge." },
+  { "cenarion",           2, "Cenarion Circle", "An order of druids dedicated to protecting nature, named for Cenarius. They maintain the balance between wilds and civilization." },
+  { "earthen ring",       2, "The Earthen Ring", "A shamanistic organization maintaining the balance of elemental forces. Critical in preventing the Cataclysm from tearing the world apart." },
+  { "argent",             2, "The Argent Crusade", "A holy order formed from the Argent Dawn and Knights of the Silver Hand. Led the assault on Icecrown Citadel against the Lich King." },
+  { "ebon blade",         2, "Knights of the Ebon Blade", "Death Knights freed from the Lich King's control. Led by Darion Mograine, they fight to prove the undead can serve a righteous cause." },
+  { "illidari",           2, "The Illidari", "Demon Hunters trained by Illidan who sacrificed their eyes and absorbed demonic power. Released from imprisonment to combat the Legion." },
+  { "shado-pan",          2, "The Shado-Pan", "Elite Pandaren military order founded by Emperor Shaohao to protect against the Sha and external threats." },
+  { "nightborne",         2, "The Nightborne", "Night elves of Suramar who sheltered beneath a magical barrier for 10,000 years. Rebelled against Elisande and joined the Horde." },
+  { "lightforged",        2, "Lightforged Draenei", "Draenei infused with the Light during their thousand-year war against the Burning Legion aboard the Vindicaar." },
+  { "void elf",           2, "Void Elves", "Blood elves exiled from Silvermoon for studying the Void. Rescued by Alleria Windrunner, they harness shadow magic." },
+  { "blood knight",       2, "Blood Knights", "The paladin order of the Blood Elves, originally powered by draining a naaru. Found genuine faith after the Sunwell's restoration." },
+  { "farstrider",         2, "Farstriders", "Elite ranger order of Quel'Thalas, defenders of the Blood Elf homeland for thousands of years." },
+  { "sunreaver",          2, "The Sunreavers", "Blood Elf members of the Kirin Tor in Dalaran, led by Aethas Sunreaver." },
+  { "silver covenant",    2, "The Silver Covenant", "High Elf loyalists in Dalaran led by Vereesa Windrunner. They represent the remnants who refused to become Blood Elves." },
+  { "forsaken",           2, "The Forsaken", "Undead who broke free from the Lich King, led by Sylvanas from the Undercity. Feared by the living and reviled by the Scourge alike." },
+  { "sentinel",           2, "The Sentinels", "The military force of the Night Elves, led by Shandris Feathermoon. Guardians of Kalimdor's forests for ten thousand years." },
+  { "watcher",            2, "The Watchers", "Night Elf order founded by Maiev Shadowsong to guard Illidan's prison. Pursued him across worlds with single-minded determination." },
+  { "venture co",         2, "Venture Company", "A ruthless goblin mining conglomerate that strips natural resources with zero regard for the environment or locals." },
+  { "syndicate",          2, "The Syndicate", "Former Alteraci nobles who lost their kingdom after the Second War. They scheme to reclaim their power from the shadows." },
+  { "grimtotem",          2, "Grimtotem Tribe", "A renegade tauren tribe that rejected Cairne's peaceful ways. They poisoned Garrosh's weapon in his Mak'gora against Cairne." },
+  { "dark iron",          2, "Dark Iron Clan", "Dwarves who summoned Ragnaros and were enslaved by him for centuries. Now led by Moira Thaurissan on the Council of Three Hammers." },
+  { "wildhammer",         2, "Wildhammer Clan", "Dwarves of the Hinterlands known for their bond with gryphons and their shamanistic traditions. Members of the Council of Three Hammers." },
+  { "frostwolf",          2, "Frostwolf Clan", "The orc clan of Thrall's father Durotan. One of the few clans that refused to drink Mannoroth's blood. Known for their bond with wolves." },
+  { "warsong",            2, "Warsong Clan", "Fierce orc warriors led by Grom Hellscream. First to drink Mannoroth's blood, and first to be freed when Grom killed Mannoroth." },
+  { "blackrock",          2, "Blackrock Clan", "The largest and most militaristic orc clan, once led by Blackhand and then Orgrim Doomhammer. They occupied Blackrock Mountain." },
+  { "dragonmaw",          2, "Dragonmaw Clan", "Orcs notorious for enslaving Alexstrasza and her red dragons during the Second War using the Demon Soul." },
+  { "shadowmoon",         2, "Shadowmoon Clan", "An orc clan of warlocks and mystics, originally led by Ner'zhul. Their mastery of shadow magic made them feared across Draenor." },
+}

@@ -35,14 +35,14 @@ function IABD:GetNPCIdFromGUID(guid)
   return npcID
 end
 
--- Look up an NPC in the lore database (by ID first, then by name)
+-- Look up an NPC in the lore database (by ID, then name, then org pattern)
 function IABD:LookupNPC(npcID, name)
   -- Try NPC ID first (exact match)
   if npcID and self.loreDB and self.loreDB[npcID] then
     return self.loreDB[npcID]
   end
 
-  -- Fallback: match by name (handles all phased/expansion NPC ID variants)
+  -- Fallback 1: match by name (handles all phased/expansion NPC ID variants)
   if name and self.nameOverrides then
     local entry = self.nameOverrides[string.lower(name)]
     if entry then
@@ -51,6 +51,16 @@ function IABD:LookupNPC(npcID, name)
         self.loreDB[npcID] = entry
       end
       return entry
+    end
+  end
+
+  -- Fallback 2: match by organization/faction pattern in the NPC's name
+  if name and self.orgPatterns then
+    local nameLower = string.lower(name)
+    for _, pattern in ipairs(self.orgPatterns) do
+      if nameLower:find(pattern[1], 1, true) then
+        return { pattern[2], pattern[3], pattern[4] }
+      end
     end
   end
 
