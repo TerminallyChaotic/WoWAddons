@@ -32,10 +32,26 @@ function IABD:GetNPCIdFromGUID(guid)
   return npcID
 end
 
--- Look up an NPC in the lore database
-function IABD:LookupNPC(npcID)
-  if not npcID or not self.loreDB then return nil end
-  return self.loreDB[npcID]
+-- Look up an NPC in the lore database (by ID first, then by name)
+function IABD:LookupNPC(npcID, name)
+  -- Try NPC ID first (exact match)
+  if npcID and self.loreDB and self.loreDB[npcID] then
+    return self.loreDB[npcID]
+  end
+
+  -- Fallback: match by name (handles all phased/expansion NPC ID variants)
+  if name and self.nameOverrides then
+    local entry = self.nameOverrides[string.lower(name)]
+    if entry then
+      -- Cache this NPC ID for future fast lookups
+      if npcID and self.loreDB then
+        self.loreDB[npcID] = entry
+      end
+      return entry
+    end
+  end
+
+  return nil
 end
 
 -- Called when the player targets something
@@ -54,17 +70,17 @@ function IABD:OnTargetChanged()
     return
   end
 
-  -- Get NPC ID from GUID
+  -- Get NPC ID from GUID and name
   local guid = UnitGUID("target")
   local npcID = self:GetNPCIdFromGUID(guid)
-  if not npcID then return end
+  local name = UnitName("target")
+  if not name then return end
 
-  -- Look up in lore database
-  local entry = self:LookupNPC(npcID)
+  -- Look up in lore database (by ID first, then by name)
+  local entry = self:LookupNPC(npcID, name)
   if not entry then return end
 
   local tier, title, lore = entry[1], entry[2], entry[3]
-  local name = UnitName("target") or "Unknown"
   self.currentTargetNPC = npcID
 
   -- Show portrait dot

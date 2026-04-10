@@ -227,5 +227,88 @@ IABD.loreDB = {
   [30714] = { 2, "Death Knight", "The first Death Knight to rejoin the Alliance. Known for his friendship with Horde Death Knight Koltira Deathweaver, proving bonds can transcend faction lines." },
 }
 
--- Name lookup table (built at load time for /iabd lookup)
-IABD.nameIndex = {}
+-- Name-based lookup (fallback when NPC ID isn't in the database)
+-- Built from loreDB entries but keyed by character name
+IABD.nameLookup = {}
+
+-- Maps common NPC names to their lore entry
+-- This catches all phased/expansion variants of a character
+IABD.nameOverrides = {
+  ["thrall"]                  = { 5, "Warchief of the Horde", "Born Go'el, raised as a slave gladiator by Aedelas Blackmoore. Escaped to unite the Horde, led them to Kalimdor, and served as Warchief. Wielder of the Doomhammer and Earth-Warder during the Cataclysm." },
+  ["go'el"]                   = { 5, "Warchief of the Horde", "Born Go'el, raised as a slave gladiator by Aedelas Blackmoore. Escaped to unite the Horde, led them to Kalimdor, and served as Warchief. Wielder of the Doomhammer and Earth-Warder during the Cataclysm." },
+  ["sylvanas windrunner"]     = { 5, "The Banshee Queen", "Former Ranger-General of Silvermoon, killed and raised as a banshee by Arthas. Broke free to lead the Forsaken, became Warchief, then shattered the Helm of Domination to tear open the Shadowlands." },
+  ["jaina proudmoore"]        = { 5, "Archmage of the Kirin Tor", "Daughter of Daelin Proudmoore, one of the most powerful mages alive. Founded Theramore, led the Kirin Tor, and has been at the center of nearly every major conflict since the Third War." },
+  ["lady jaina proudmoore"]   = { 5, "Archmage of the Kirin Tor", "Daughter of Daelin Proudmoore, one of the most powerful mages alive. Founded Theramore, led the Kirin Tor, and has been at the center of nearly every major conflict since the Third War." },
+  ["anduin wrynn"]            = { 5, "King of Stormwind", "Son of Varian Wrynn, became High King of the Alliance at a young age. A priest-king who seeks peace but was forced into war. Dominated by the Jailer in the Shadowlands before being freed." },
+  ["king anduin wrynn"]       = { 5, "King of Stormwind", "Son of Varian Wrynn, became High King of the Alliance at a young age. A priest-king who seeks peace but was forced into war. Dominated by the Jailer in the Shadowlands before being freed." },
+  ["illidan stormrage"]       = { 5, "The Betrayer", "Twin brother of Malfurion, imprisoned for 10,000 years for creating a second Well of Eternity. Consumed the Skull of Gul'dan, became a demon hunter, and ultimately sacrificed everything to defeat the Burning Legion." },
+  ["illidan"]                 = { 5, "The Betrayer", "Twin brother of Malfurion, imprisoned for 10,000 years for creating a second Well of Eternity. Consumed the Skull of Gul'dan, became a demon hunter, and ultimately sacrificed everything to defeat the Burning Legion." },
+  ["the lich king"]           = { 5, "The Lich King", "Prince of Lordaeron who took up Frostmourne to save his people, only to lose his soul. Merged with the Lich King and sat frozen on the Frozen Throne until his defeat at Icecrown Citadel." },
+  ["arthas menethil"]         = { 5, "The Lich King", "Prince of Lordaeron who took up Frostmourne to save his people, only to lose his soul. Merged with the Lich King and sat frozen on the Frozen Throne until his defeat at Icecrown Citadel." },
+  ["bolvar fordragon"]        = { 5, "The Lich King Reborn", "Highlord of the Alliance, fell at the Wrathgate. Tortured by dragonfire, he donned the Helm of Domination to contain the Scourge as the new Lich King." },
+  ["highlord bolvar fordragon"] = { 5, "The Lich King Reborn", "Highlord of the Alliance, fell at the Wrathgate. Tortured by dragonfire, he donned the Helm of Domination to contain the Scourge as the new Lich King." },
+  ["malfurion stormrage"]     = { 5, "First of the Druids", "Twin of Illidan, first mortal druid taught by Cenarius himself. Slept in the Emerald Dream for millennia. Archdruid of the Night Elves and husband of Tyrande Whisperwind." },
+  ["tyrande whisperwind"]     = { 5, "High Priestess of Elune", "Leader of the Night Elves for over 10,000 years. Became the Night Warrior by channeling Elune's darkest fury to avenge Teldrassil." },
+  ["tyrande"]                 = { 5, "High Priestess of Elune", "Leader of the Night Elves for over 10,000 years. Became the Night Warrior by channeling Elune's darkest fury to avenge Teldrassil." },
+  ["vol'jin"]                 = { 5, "Warchief of the Horde", "Son of Sen'jin, leader of the Darkspear trolls. Rose from exile to become Warchief. Mortally wounded at the Broken Shore, naming Sylvanas as successor." },
+  ["garrosh hellscream"]      = { 5, "Former Warchief", "Son of Grom Hellscream, rose to become the most feared Warchief. His reign of conquest ended at the Siege of Orgrimmar." },
+  ["varian wrynn"]            = { 5, "High King of the Alliance", "King of Stormwind, fought as gladiator Lo'Gosh before reclaiming his throne. Sacrificed himself at the Broken Shore to save the Alliance fleet." },
+  ["king varian wrynn"]       = { 5, "High King of the Alliance", "King of Stormwind, fought as gladiator Lo'Gosh before reclaiming his throne. Sacrificed himself at the Broken Shore to save the Alliance fleet." },
+  ["khadgar"]                 = { 5, "Archmage of the Kirin Tor", "Former apprentice of Medivh, aged prematurely when he helped defeat his master. One of the most powerful mages in Azeroth's history." },
+  ["archmage khadgar"]        = { 5, "Archmage of the Kirin Tor", "Former apprentice of Medivh, aged prematurely when he helped defeat his master. One of the most powerful mages in Azeroth's history." },
+  ["magni bronzebeard"]       = { 5, "The Speaker", "Former King of Ironforge turned to diamond. Became the Speaker for Azeroth, hearing the world-soul's voice." },
+
+  -- Epic
+  ["lor'themar theron"]       = { 4, "Regent Lord of Quel'Thalas", "Led the Blood Elves after Kael'thas's betrayal. Guided his people through addiction, invasion, and upheaval to become one of the Horde's most respected leaders." },
+  ["regent lord lor'themar theron"] = { 4, "Regent Lord of Quel'Thalas", "Led the Blood Elves after Kael'thas's betrayal. Guided his people through addiction, invasion, and upheaval to become one of the Horde's most respected leaders." },
+  ["baine bloodhoof"]         = { 4, "High Chieftain of the Tauren", "Son of Cairne, took leadership after his father was killed by Garrosh. A voice of reason and honor within the Horde." },
+  ["genn greymane"]           = { 4, "King of Gilneas", "Built the Greymane Wall to isolate Gilneas. Afflicted by the Worgen curse, now leads his displaced people with a burning hatred for Sylvanas." },
+  ["king genn greymane"]      = { 4, "King of Gilneas", "Built the Greymane Wall to isolate Gilneas. Afflicted by the Worgen curse, now leads his displaced people with a burning hatred for Sylvanas." },
+  ["first arcanist thalyssra"] = { 4, "First Arcanist of Suramar", "Led the Nightborne rebellion against Elisande's alliance with the Burning Legion. Freed Suramar and brought her people into the Horde." },
+  ["thalyssra"]               = { 4, "First Arcanist of Suramar", "Led the Nightborne rebellion against Elisande's alliance with the Burning Legion. Freed Suramar and brought her people into the Horde." },
+  ["alleria windrunner"]      = { 4, "Void Ranger", "Eldest Windrunner sister, lost in the Twisting Nether for a thousand years. Returned infused with Void powers, walking a dangerous line between Light and Shadow." },
+  ["turalyon"]                = { 4, "High Exarch of the Army of the Light", "One of the original paladins. Spent a thousand years battling the Burning Legion across the cosmos before returning to lead Alliance forces." },
+  ["high exarch turalyon"]    = { 4, "High Exarch of the Army of the Light", "One of the original paladins. Spent a thousand years battling the Burning Legion across the cosmos before returning to lead Alliance forces." },
+  ["lady liadrin"]            = { 4, "Matriarch of the Blood Knights", "Former priestess who pioneered the Blood Knight order. Found true redemption when the Sunwell was restored." },
+  ["queen talanji"]           = { 4, "Queen of the Zandalari", "Daughter of King Rastakhan, became queen after her father's death at Dazar'alor. Brought the ancient Zandalari Empire into the Horde." },
+  ["talanji"]                 = { 4, "Queen of the Zandalari", "Daughter of King Rastakhan, became queen after her father's death at Dazar'alor. Brought the ancient Zandalari Empire into the Horde." },
+  ["calia menethil"]          = { 4, "Princess of Lordaeron", "Sister of Arthas, killed by Sylvanas, resurrected by the Light as undead. Represents a possible future for the Forsaken." },
+  ["prophet velen"]           = { 4, "Prophet of the Naaru", "Ancient leader of the Draenei, one of three eredar who refused Sargeras's offer. Led his people on a 25,000-year exodus guided by the Light." },
+  ["velen"]                   = { 4, "Prophet of the Naaru", "Ancient leader of the Draenei, one of three eredar who refused Sargeras's offer. Led his people on a 25,000-year exodus guided by the Light." },
+  ["alexstrasza"]             = { 4, "The Life-Binder", "Queen of the Red Dragonflight and Aspect of Life. Enslaved by the Dragonmaw orcs, she endured unspeakable suffering. Champions all living things." },
+  ["alexstrasza the life-binder"] = { 4, "The Life-Binder", "Queen of the Red Dragonflight and Aspect of Life. Enslaved by the Dragonmaw orcs, she endured unspeakable suffering. Champions all living things." },
+  ["nozdormu"]                = { 4, "The Timeless One", "Aspect of the Bronze Dragonflight. Cursed with knowledge of his own corruption into Murozond. Guards the one true timeline." },
+  ["wrathion"]                = { 4, "The Black Prince", "Last uncorrupted Black Dragon, son of Deathwing. A master manipulator who claims to act for Azeroth's greater good." },
+  ["kalecgos"]                = { 4, "Aspect of the Blue Dragonflight", "Became Aspect of Magic after Malygos's madness and death. A bridge between dragonkind and mortal races." },
+  ["chromie"]                 = { 4, "Ambassador of the Bronze Dragonflight", "A Bronze dragon who prefers gnome form. Guardian of the timeways, helping adventurers navigate temporal crises." },
+  ["chronormu"]               = { 4, "Ambassador of the Bronze Dragonflight", "A Bronze dragon who prefers gnome form. Guardian of the timeways, helping adventurers navigate temporal crises." },
+  ["merithra"]                = { 4, "Aspect of the Green Dragonflight", "Daughter of Ysera, inherited the green dragonflight. Became the new Green Aspect during the Dragonflight's renewal." },
+  ["ebyssian"]                = { 4, "The Hidden Dragon", "A Black Dragon disguised as Spiritwalker Ebonhorn among the Highmountain tauren for generations. One of the few uncorrupted black dragons." },
+  ["spiritwalker ebonhorn"]   = { 4, "The Hidden Dragon", "A Black Dragon disguised as Spiritwalker Ebonhorn among the Highmountain tauren for generations. One of the few uncorrupted black dragons." },
+  ["mayla highmountain"]      = { 4, "High Chieftain of Highmountain", "United the Highmountain tauren tribes against the drogbar threat. Descended from Huln Highmountain of the War of the Ancients." },
+
+  -- Rare
+  ["darion mograine"]         = { 3, "Highlord of the Ebon Blade", "Son of Alexandros Mograine, the Ashbringer. Sacrificed himself to free his father's soul, raised as a Death Knight, now leads the Knights of the Ebon Blade." },
+  ["highlord darion mograine"] = { 3, "Highlord of the Ebon Blade", "Son of Alexandros Mograine, the Ashbringer. Sacrificed himself to free his father's soul, raised as a Death Knight, now leads the Knights of the Ebon Blade." },
+  ["varok saurfang"]          = { 3, "High Overlord of the Horde", "Legendary orc warrior who fought in every major Horde conflict since the First War. Died challenging Sylvanas in Mak'gora before Orgrimmar." },
+  ["high overlord saurfang"]  = { 3, "High Overlord of the Horde", "Legendary orc warrior who fought in every major Horde conflict since the First War. Died challenging Sylvanas in Mak'gora before Orgrimmar." },
+  ["muradin bronzebeard"]     = { 3, "Council of Three Hammers", "Brother of Magni and Brann. Thought dead after helping Arthas find Frostmourne, survived with amnesia among the Frostborn." },
+  ["brann bronzebeard"]       = { 3, "Explorer Supreme", "The most famous explorer in Azeroth. Has a knack for stumbling into titan facilities and world-ending discoveries." },
+  ["rexxar"]                  = { 3, "Champion of the Horde", "Half-ogre, half-orc beastmaster. Bonded with the bear Misha. Helped Thrall establish Orgrimmar." },
+  ["flynn fairwind"]          = { 3, "Captain of the Middenwake", "A charming rogue and captain of questionable reputation in Boralus. Unlikely hero of the Fourth War." },
+  ["taelia fordragon"]        = { 3, "Knight of the Alliance", "Daughter of Bolvar Fordragon, raised in Kul Tiras without knowing her father became the Lich King." },
+  ["lillian voss"]            = { 3, "Forsaken Assassin", "Daughter of a Scarlet Crusade leader, killed and raised as Forsaken. Became a deadly rogue before finding new purpose." },
+  ["taran zhu"]               = { 3, "Lord of the Shado-Pan", "Leader of the ancient order sworn to protect Pandaria from the Sha." },
+  ["chen stormstout"]         = { 3, "Legendary Brewmaster", "Wandering Pandaren brewmaster who helped Vol'jin and Thrall during the founding of Durotar." },
+  ["shandris feathermoon"]    = { 3, "General of the Sentinel Army", "Adopted daughter of Tyrande. The Night Elves' greatest military commander for over 10,000 years." },
+  ["trade prince gallywix"]   = { 3, "Trade Prince of the Bilgewater Cartel", "The greediest goblin alive. Enslaved his own people during Kezan's destruction. Eventually ousted for corruption." },
+  ["nathanos blightcaller"]   = { 3, "Champion of the Banshee Queen", "First human ranger lord of Quel'Thalas in life. Sylvanas's most devoted follower in undeath. Killed by Tyrande." },
+
+  -- Uncommon
+  ["mankrik"]                 = { 2, "Grieving Warrior", "An orc warrior in the Barrens, famous for the quest to find his wife — one of WoW's most iconic memes." },
+  ["hemet nesingwary"]        = { 2, "Big Game Hunter", "The most famous hunter in Azeroth. Has set up hunting camps across multiple continents." },
+  ["nat pagle"]               = { 2, "Master Angler", "The greatest fisherman in Azeroth. Found fishing off Dustwallow Marsh, his reputation spans every continent." },
+  ["harrison jones"]          = { 2, "Adventurer and Archaeologist", "Azeroth's most dashing archaeologist, inspired by a certain whip-wielding movie hero." },
+  ["maximillian of northshire"] = { 2, "Delusional Knight", "Believes himself a great paladin in Un'Goro Crater. Mistakes dinosaurs for dragons. Beloved for his unshakeable optimism." },
+  ["lorewalker cho"]          = { 2, "Keeper of Pandaren Lore", "Head of the Lorewalkers, a gentle scholar who preserves Pandaren history through stories." },
+}

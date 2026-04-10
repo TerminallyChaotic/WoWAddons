@@ -51,9 +51,9 @@ function IABD:ShowCurrentTargetInfo()
     return
   end
 
-  local entry = self:LookupNPC(npcID)
+  local entry = self:LookupNPC(npcID, name)
   if not entry then
-    print("|cffff8000I'm A Big Deal:|r " .. name .. " (NPC ID: " .. npcID .. ") — Not in lore database.")
+    print("|cffff8000I'm A Big Deal:|r " .. name .. " (NPC ID: " .. tostring(npcID) .. ") — Not in lore database.")
     print("  Consider submitting this NPC on GitHub!")
     return
   end
