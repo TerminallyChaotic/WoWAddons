@@ -633,11 +633,11 @@ function UI:CreateCollectionBrowser()
   filterLabel:SetTextColor(0.6, 0.6, 0.6)
 
   panel.currentFilter = 0  -- 0 = all
-  local filterNames = { "All", "Legendary", "Epic", "Rare", "Uncommon", "Common" }
-  local filterTiers = { 0, 5, 4, 3, 2, 1 }
+  local filterNames = { "All", "Common", "Uncommon", "Rare", "Epic", "Legendary" }
+  local filterTiers = { 0, 1, 2, 3, 4, 5 }
   local filterColors = {
-    { 1, 1, 1 }, { 1, 0.5, 0 }, { 0.64, 0.21, 0.93 },
-    { 0, 0.44, 0.87 }, { 0.12, 1, 0 }, { 1, 1, 1 },
+    { 1, 1, 1 }, { 1, 1, 1 }, { 0.12, 1, 0 },
+    { 0, 0.44, 0.87 }, { 0.64, 0.21, 0.93 }, { 1, 0.5, 0 },
   }
   panel.filterButtons = {}
 
