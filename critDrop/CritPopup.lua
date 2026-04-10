@@ -31,23 +31,60 @@ CP.settings = {
 -- Crit sound options (id 0 = off)
 -- Sound options (PlaySound numeric IDs only — PlaySoundFile is dead in 12.0)
 CP.critSounds = {
+  -- Off
   { name = "Off",              soundID = nil },
+
+  -- UI & Alerts
   { name = "Level Up",         soundID = 888 },
   { name = "Raid Warning",     soundID = 8959 },
   { name = "PvP Warning",      soundID = 8332 },
   { name = "Quest Complete",    soundID = 618 },
-  { name = "Loot Coin",        soundID = 120 },
-  { name = "Map Ping",         soundID = 3175 },
   { name = "Ready Check",      soundID = 8960 },
+  { name = "Fanfare",          soundID = 8455 },
+  { name = "Map Ping",         soundID = 3175 },
+
+  -- Loot & Rewards
+  { name = "Loot Coin",        soundID = 120 },
+  { name = "Loot Epic",        soundID = 10989 },
+  { name = "Loot Legendary",   soundID = 60063 },
+  { name = "Rare Find",        soundID = 11466 },
+  { name = "Achievement!",     soundID = 12867 },
+
+  -- Combat Impacts
+  { name = "Punch",            soundID = 566 },
+  { name = "Sword Clang",      soundID = 37 },
+  { name = "Mace Hit",         soundID = 42 },
+  { name = "Shield Block",     soundID = 48 },
+  { name = "Armor Crack",      soundID = 4801 },
+  { name = "Gore Hit",         soundID = 3930 },
   { name = "Bonk",             soundID = 3338 },
+
+  -- Magic & Spell
+  { name = "Arcane Blast",     soundID = 9487 },
+  { name = "Frostbolt Hit",    soundID = 65 },
+  { name = "Fireball Impact",  soundID = 11831 },
+  { name = "Shadow Bolt",      soundID = 9338 },
+  { name = "Holy Smite",       soundID = 6948 },
+  { name = "Lightning Zap",    soundID = 12747 },
+  { name = "Power Up",         soundID = 12199 },
+
+  -- Drums & Horns
+  { name = "War Drum",         soundID = 8585 },
+  { name = "Battle Horn",      soundID = 12505 },
+  { name = "Horn of Winter",   soundID = 11964 },
+
+  -- Dramatic
+  { name = "Shay's Bell",      soundID = 6595 },
   { name = "Humm",             soundID = 6674 },
   { name = "Auction Gavel",    soundID = 5274 },
-  { name = "Loot Epic",        soundID = 10989 },
-  { name = "Power Up",         soundID = 12199 },
-  { name = "Shay's Bell",      soundID = 6595 },
-  { name = "Fanfare",          soundID = 8455 },
-  { name = "Thunder",          soundID = 12747 },
-  { name = "War Drum",         soundID = 8585 },
+  { name = "Death Knight",     soundID = 12504 },
+
+  -- Creature Sounds
+  { name = "Dragon Roar",      soundID = 12573 },
+  { name = "Wolf Howl",        soundID = 1018 },
+  { name = "Bear Growl",       soundID = 1000 },
+  { name = "Cat Hiss",         soundID = 1007 },
+  { name = "Murloc",           soundID = 4065 },
 }
 
 -- Runtime state

@@ -6,6 +6,7 @@
 ## SavedVariables: ImABigDealDB
 
 data.lua
+data_generated.lua
 ui.lua
 ImABigDeal.lua
 config.lua

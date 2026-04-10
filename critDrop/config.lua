@@ -504,14 +504,46 @@ SlashCmdList["CRITPOPUP"] = function(msg)
       frame:Show()
       CP.animations:PlaySequence(frame, CP.settings.durationSeconds)
     end
+  elseif cmd == "audition" then
+    print("|cff00ff00Crit Drop:|r Auditioning all sounds (2s apart)...")
+    for i, entry in ipairs(CP.critSounds) do
+      if entry.soundID then
+        C_Timer.After((i - 1) * 2, function()
+          local success, handle = PlaySound(entry.soundID, "SFX")
+          if success then
+            print("|cff00ff00  [" .. i .. "]|r " .. entry.name .. " (ID: " .. entry.soundID .. ") — WORKS")
+            if handle then
+              C_Timer.After(1.5, function() StopSound(handle, 0) end)
+            end
+          else
+            print("|cffff0000  [" .. i .. "]|r " .. entry.name .. " (ID: " .. entry.soundID .. ") — SILENT")
+          end
+        end)
+      end
+    end
+  elseif cmd == "tryid" then
+    local id = tonumber(arg)
+    if not id then
+      print("|cffff0000Crit Drop:|r Usage: /cp tryid 12345")
+      return
+    end
+    local success, handle = PlaySound(id, "SFX")
+    if success then
+      print("|cff00ff00Crit Drop:|r Sound " .. id .. " playing")
+      local maxDur = CP.settings.soundMaxDuration or 1.0
+      if handle and maxDur > 0 then
+        C_Timer.After(maxDur, function() StopSound(handle, 0) end)
+      end
+    else
+      print("|cffff0000Crit Drop:|r Sound " .. id .. " — SILENT")
+    end
   else
     print("Crit Drop commands:")
     print("  /cp — Toggle settings panel")
     print("  /cp test — Test normal hit")
     print("  /cp testcrit — Test crit hit")
-    print("  /cp addsound <file.ogg> — Register custom crit sound")
-    print("  /cp removesound <file.ogg> — Remove custom sound")
-    print("  /cp listsounds — List custom sounds")
+    print("  /cp audition — Play all sounds (2s apart)")
+    print("  /cp tryid <number> — Test a specific sound ID")
   end
 end
 
