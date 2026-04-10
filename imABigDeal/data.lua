@@ -401,9 +401,12 @@ IABD.orgPatterns = {
 
   -- Major villain factions
   { "twilight's hammer",  3, "Twilight's Hammer", "A nihilistic cult devoted to the Old Gods and the destruction of all life. Originally an orc clan, they were transformed into a doomsday cult by Cho'gall and served Deathwing during the Cataclysm." },
+  { "twilight's blade",   3, "Twilight's Hammer", "The Twilight's Blade are an elite militant arm of the Twilight's Hammer cult, devoted to the Old Gods and the destruction of all life. Transformed into a doomsday cult by Cho'gall and served Deathwing during the Cataclysm." },
   { "twilight hammer",    3, "Twilight's Hammer", "A nihilistic cult devoted to the Old Gods and the destruction of all life. Originally an orc clan, they were transformed into a doomsday cult by Cho'gall and served Deathwing during the Cataclysm." },
   { "twilight cultist",   3, "Twilight's Hammer", "A nihilistic cult devoted to the Old Gods and the destruction of all life. Originally an orc clan, they were transformed into a doomsday cult by Cho'gall and served Deathwing during the Cataclysm." },
   { "twilight prophet",   3, "Twilight's Hammer", "A nihilistic cult devoted to the Old Gods and the destruction of all life. Originally an orc clan, they were transformed into a doomsday cult by Cho'gall and served Deathwing during the Cataclysm." },
+  { "twilight drake",     3, "Twilight Dragonflight", "Twisted dragons created by the Twilight's Hammer through dark experiments, fusing chromatic and shadow magic. They serve as shock troops for the cult's war against the mortal races." },
+  { "twilight dragon",    3, "Twilight Dragonflight", "Twisted dragons created by the Twilight's Hammer through dark experiments, fusing chromatic and shadow magic. They serve as shock troops for the cult's war against the mortal races." },
   { "scarlet crusad",     3, "Scarlet Crusade", "A fanatical order of zealots dedicated to eradicating the undead — and anyone they suspect of being sympathetic to them. Their paranoia made them nearly as dangerous as the Scourge itself." },
   { "scarlet monk",       3, "Scarlet Crusade", "A fanatical order of zealots dedicated to eradicating the undead — and anyone they suspect of being sympathetic to them. Their paranoia made them nearly as dangerous as the Scourge itself." },
   { "scarlet warrior",    3, "Scarlet Crusade", "A fanatical order of zealots dedicated to eradicating the undead — and anyone they suspect of being sympathetic to them. Their paranoia made them nearly as dangerous as the Scourge itself." },
@@ -469,4 +472,105 @@ IABD.orgPatterns = {
   { "blackrock",          2, "Blackrock Clan", "The largest and most militaristic orc clan, once led by Blackhand and then Orgrim Doomhammer. They occupied Blackrock Mountain." },
   { "dragonmaw",          2, "Dragonmaw Clan", "Orcs notorious for enslaving Alexstrasza and her red dragons during the Second War using the Demon Soul." },
   { "shadowmoon",         2, "Shadowmoon Clan", "An orc clan of warlocks and mystics, originally led by Ner'zhul. Their mastery of shadow magic made them feared across Draenor." },
+
+  -- Orc clans (continued)
+  { "bleeding hollow",    2, "Bleeding Hollow Clan", "Orc clan known for their berserker rituals and willingness to sacrifice an eye for prophetic visions. One of the most savage clans of the Old Horde." },
+  { "shattered hand",     2, "Shattered Hand Clan", "Orc clan whose members sever their own hands and replace them with weapons as a rite of initiation. Founded by Kargath Bladefist." },
+  { "thunderlord",        2, "Thunderlord Clan", "Orc clan of Frostfire Ridge known for their mastery of beasts and hunting. Famous for taming the great rylaks and gronn of Draenor." },
+  { "laughing skull",     2, "Laughing Skull Clan", "A reckless and slightly unhinged orc clan. Known for their unpredictable nature and willingness to ally with anyone if it serves their interests." },
+  { "bonechewer",         2, "Bonechewer Clan", "A savage orc clan that ritually cannibalizes their enemies. Among the most feared and reviled of all the Horde clans." },
+  { "burning blade",      2, "Burning Blade Clan", "An orc clan that turned to demon worship and shadow magic. Their warlocks and blademasters served the Shadow Council's dark agenda." },
+  { "twilight's hammer clan", 3, "Twilight's Hammer", "Originally an orc clan before being remade into a doomsday cult devoted to the Old Gods under Cho'gall's leadership." },
+
+  -- Night Elf / Suramar
+  { "nightfallen",        2, "The Nightfallen", "Nightborne who were cut off from the Nightwell and began withering into feral, mana-starved husks. The rebellion's first recruits were those rescued from this fate." },
+  { "duskwatch",          2, "The Duskwatch", "Suramar's elite guard force, loyal to Grand Magistrix Elisande. They enforced the city's arcane laws and hunted dissidents during the Legion occupation." },
+  { "moonguard",          2, "The Moon Guard", "An ancient order of Night Elf magi who defended Suramar during the War of the Ancients. Their legacy endures in the ruins that bear their name." },
+  { "highborne",          2, "The Highborne", "The upper caste of ancient Night Elf society, master arcanists who served Queen Azshara. Their reckless use of arcane magic drew the Burning Legion to Azeroth." },
+
+  -- Burning Legion demons
+  { "felguard",           2, "The Burning Legion", "Demonic shock troops of the Burning Legion. Brutal, disciplined warriors that form the backbone of the Legion's ground forces." },
+  { "wrathguard",         2, "The Burning Legion", "Elite demon warriors wielding twin blades. A more powerful variant of the Felguard, serving as commanders and champions of the Burning Legion." },
+  { "doomguard",          2, "The Burning Legion", "Powerful winged demons that serve as officers and enforcers in the Burning Legion. Summoning one requires tremendous power and usually a sacrifice." },
+  { "dreadlord",          3, "The Nathrezim", "Cunning, manipulative demons who specialize in subterfuge and corruption. They have infiltrated mortal civilizations for millennia, pulling strings from the shadows." },
+  { "nathrezim",          3, "The Nathrezim", "Cunning, manipulative demons who specialize in subterfuge and corruption. Secretly serve Sire Denathrius of Revendreth, not the Burning Legion." },
+  { "eredar",             3, "The Eredar", "Once a noble race, most were corrupted by Sargeras into serving the Burning Legion. The Draenei are the eredar who refused, fleeing across the cosmos." },
+  { "man'ari",            3, "The Man'ari Eredar", "Eredar who accepted Sargeras's offer of power and became demons. The most powerful warlocks and sorcerers in the Burning Legion." },
+  { "pit lord",           3, "Pit Lords", "Massive, brutal demons that serve as generals of the Burning Legion's armies. Mannoroth and Magtheridon were among the most notorious." },
+  { "infernal",           2, "The Burning Legion", "Colossal constructs of fel-infused stone, hurled from the sky as living siege weapons. They burn everything they touch and feel no pain." },
+  { "imp ",               1, "The Burning Legion", "The smallest and most numerous demons of the Burning Legion. Despite their size, they are cunning, cruel, and dangerous in large numbers." },
+  { "felhound",           2, "The Burning Legion", "Eyeless demons that devour magic itself. Used by the Burning Legion to track and neutralize enemy spellcasters." },
+
+  -- Old God / Void forces
+  { "faceless",           3, "The N'raqi", "Faceless Ones are the soldiers of the Old Gods, eyeless aberrations that lurk in the deep places of the world. They whisper madness and serve their imprisoned masters." },
+  { "n'raqi",             3, "The N'raqi", "The Faceless Ones — soldiers of the Old Gods who dwell in the earth's deepest places, waiting for their masters to awaken." },
+  { "aqir",               3, "The Aqir", "An ancient insectoid race created by the Old Gods to wage war against the troll empires. They split into the Qiraji, Nerubians, and Mantid." },
+  { "void lord",          3, "Void Lords", "Incomprehensible entities from the Void Beyond who seek to corrupt world-souls. They created the Old Gods and sent them to infest developing worlds." },
+  { "ethereal",           2, "The Ethereals", "Beings of pure arcane energy wrapped in magical bandages. Their homeworld K'aresh was destroyed by the Void, and now they survive as interdimensional traders and gamblers." },
+  { "k'thir",             2, "The K'thir", "Tentacled servants of N'Zoth found in Kul Tiras and Stormsong Valley. Corrupted humanoids who worship the deep ocean and the Old God beneath." },
+
+  -- Elemental forces
+  { "fire elemental",     2, "Elemental Lords of Fire", "Servants of Ragnaros the Firelord, born of living flame in the Firelands. They seek to burn all of creation to ash." },
+  { "water elemental",    1, "Water Elementals", "Elementals of the Abyssal Maw, ruled by Neptulon the Tidehunter. They range from mindless water constructs to powerful tidal lords." },
+  { "earth elemental",    1, "Earth Elementals", "Beings of living stone from the elemental plane of Deepholm, ruled by Therazane the Stonemother." },
+  { "air elemental",      1, "Air Elementals", "Beings of wind and lightning from the Skywall, once ruled by Al'Akir the Windlord before his defeat." },
+  { "sulfuron",           3, "Sulfuron", "Ragnaros's most powerful lieutenant, a fire elemental lord who commanded the armies of the Firelands. Executus served as his ambassador to the mortal world." },
+
+  -- Titan-forged
+  { "titan keeper",       3, "Titan Keepers", "Enormous constructs created by the Titans to shape and protect Azeroth. Odyn, Freya, Thorim, Hodir, Loken, and Tyr each guarded a different aspect of the world." },
+  { "titan construct",    2, "Titan Constructs", "Mechanical servants built by the Titans to maintain their facilities across Azeroth. Many still patrol ruins like Ulduar, Uldaman, and Uldum." },
+  { "vrykul",             2, "The Vrykul", "A race of giant, Norse-inspired warriors native to Northrend. The ancestors of humans, who arose when some vrykul offspring were born small and weak." },
+  { "val'kyr",            2, "The Val'kyr", "Ascended vrykul spirit-warriors who serve in the halls of the afterlife. Some were bound to the Lich King, others to Odyn, and later to Sylvanas." },
+  { "kvaldir",            2, "The Kvaldir", "Terrifying spectral vrykul sea-raiders who emerge from the mist to attack coastal settlements. They are the cursed, drowned dead of vrykul legend." },
+  { "earthen",            2, "The Earthen", "Titan-forged dwarves of living stone, the original form before the Curse of Flesh transformed them into mortal dwarves. Some still endure in places like Khaz Algar." },
+  { "mechagnome",         2, "Mechagnomes", "Gnomes who have replaced parts of their bodies with mechanical augmentations, following the example of their creator Mechagon King Mechagon." },
+  { "iron dwarf",         2, "Iron Dwarves", "Titan-forged corrupted by Loken in Northrend. Unlike the Earthen who became flesh, these remain metallic but serve dark purposes." },
+
+  -- Pandaria factions
+  { "yaungol",            2, "The Yaungol", "Distant relatives of the Tauren who migrated north to Kun-Lai Summit. Fierce, aggressive warriors that raid Pandaren settlements with fire oil weapons." },
+  { "hozen",              1, "The Hozen", "Monkey-like creatures native to Pandaria. Crude, impulsive, and hilarious. They have a famously short attention span and even shorter temper." },
+  { "jinyu",              1, "The Jinyu", "Fish-like humanoids of Pandaria who can read the waters to divine the future. An ancient and wise people allied with the Pearlfin tribe." },
+  { "grummle",            1, "The Grummles", "Small, cheerful creatures who serve as traders and guides through Kun-Lai Summit's mountain passes. Known for their love of 'luckydos' — lucky charms." },
+  { "saurok",             2, "The Saurok", "Lizardfolk created by the Mogu through dark flesh-shaping magic. They revolted against their creators and now infest ruins across Pandaria." },
+  { "virmen",             1, "The Virmen", "Rabbit-like pests that devour crops across the Valley of the Four Winds. Every Pandaren farmer's worst nightmare." },
+
+  -- Broken Isles / Legion era
+  { "feltotem",           2, "The Feltotem", "Highmountain tauren corrupted by the Burning Legion's fel magic. They betrayed their kin and serve as shock troops for the Legion's invasion." },
+  { "withered",           2, "The Withered", "Nightborne who have fully succumbed to mana withdrawal, becoming feral and mindless. A tragic fate that awaits any Nightborne cut off from arcane sustenance." },
+  { "court of stars",     2, "The Court of Stars", "The elite nobility of Suramar City, loyal to Grand Magistrix Elisande. They lived in luxury while their people suffered under the Legion's occupation." },
+
+  -- Shadowlands
+  { "kyrian",             2, "The Kyrian", "Angelic soul-guides of Bastion in the Shadowlands. They ferry worthy souls to the afterlife, but must shed all memory of their mortal lives to ascend." },
+  { "venthyr",            2, "The Venthyr", "Vampire-like beings of Revendreth who extract sins from prideful souls. They hold grand parties in gothic castles while judging the dead." },
+  { "necrolord",          2, "The Necrolords", "Warriors of Maldraxxus in the Shadowlands, the military might of Death itself. They believe strength and honor in combat determine one's worth." },
+  { "night fae",          2, "The Night Fae", "Caretakers of Ardenweald, the Shadowlands realm that nurtures the spirits of nature. They tend to the great trees where wild souls rest and dream." },
+  { "mawsworn",           3, "The Mawsworn", "Forces loyal to the Jailer in the Maw, the Shadowlands' inescapable prison. They seek to unmake reality and rewrite the purpose of Death itself." },
+  { "the jailer",         4, "Zovaal, The Jailer", "The original Arbiter of the Shadowlands, imprisoned in the Maw by the other Eternal Ones for attempting to claim the First Ones' power. Mastermind behind the events of the Shadowlands expansion." },
+  { "broker",             2, "The Brokers", "Interdimensional traders and information dealers who operate across all realms of the Shadowlands. They deal in anima, secrets, and anything else of value." },
+
+  -- Dragon Isles
+  { "djaradin",           2, "The Djaradin", "Ancient fire-wielding giants and eternal enemies of the dragons. They have battled dragonkind since before recorded history on the Dragon Isles." },
+  { "tuskarr",            1, "The Tuskarr", "Friendly walrus-people known for their fishing skills, hearty stews, and generous hospitality. Found in Northrend and the Dragon Isles." },
+  { "centaur",            2, "The Centaur", "Half-horse nomadic warriors of the open plains. On the Dragon Isles, the Maruuk Centaur maintain ancient traditions of honor and horsemanship." },
+  { "gorloc",             1, "The Gorlocs", "Distant relatives of Murlocs found in Northrend. Slightly more intelligent and slightly less hostile. Slightly." },
+
+  -- Classic / common mob races
+  { "murloc",             1, "Murlocs", "Amphibious fish-people found on every coastline in Azeroth. Their gurgling battle cry 'MRGGLGLGL' is one of the most recognized sounds in gaming history." },
+  { "kobold",             1, "Kobolds", "Small, candle-obsessed rat-creatures that infest mines across the Eastern Kingdoms. 'You no take candle!' is their sacred war cry." },
+  { "trogg",              1, "Troggs", "Degenerate titan-forged, the result of the Curse of Flesh taken to its extreme. Simple-minded and aggressive, they infest underground areas." },
+  { "gnoll",              1, "Gnolls", "Hyena-like humanoids that form raiding packs across the Eastern Kingdoms. Not bright, but dangerous in numbers. Hogger is their most infamous representative." },
+  { "harpy",              1, "Harpies", "Vicious, bird-like humanoids that inhabit mountains and canyons. They are territorial, aggressive, and despised by nearly everyone." },
+  { "satyr",              2, "Satyrs", "Night elves corrupted by the Burning Legion into demonic forms during the War of the Ancients. They lurk in forests and ruins, spreading corruption." },
+  { "furbolg",            1, "Furbolgs", "Bear-like creatures native to Kalimdor and Northrend. Once peaceful druids allied with the Night Elves, many were driven mad by corruption." },
+  { "makrura",            1, "Makrura", "Lobster-like creatures found along Kalimdor's coasts. Territorial and aggressive, they guard their nesting grounds fiercely." },
+
+  -- Pirate factions
+  { "bloodsail",          2, "Bloodsail Buccaneers", "The most notorious pirate fleet in Azeroth, sworn enemies of the Steamwheedle Cartel goblins. Based in the waters around Stranglethorn Vale." },
+  { "blackwater",         2, "Blackwater Raiders", "A ruthless pirate organization that operates out of Booty Bay and across the South Seas. Mercenaries and smugglers without loyalty." },
+  { "irontide",           2, "Irontide Raiders", "Kul Tiran pirates led by the massive Harlan Sweete. They terrorized Tiragarde Sound during the Fourth War." },
+
+  -- Midnight expansion
+  { "arathi",             2, "The Arathi", "An ancient human civilization returned from across the sea, wielding the power of the Light. Their arrival in Hallowfall marks a pivotal moment in Midnight's story." },
+  { "lamplighter",        2, "The Lamplighters", "Arathi who maintain the sacred flames that hold back the darkness in Hallowfall. Without their vigil, the shadows would consume everything." },
+  { "general's army",     2, "The General's Forces", "Military forces operating in the Midnight expansion's zones, part of the unfolding conflict around Quel'Thalas and the Sunwell." },
 }
