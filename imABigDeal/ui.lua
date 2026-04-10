@@ -71,7 +71,9 @@ function UI:CreateToast()
 
   local toast = CreateFrame("Frame", "ImABigDealToast", UIParent)
   toast:SetSize(380, 100)
-  toast:SetPoint("TOP", UIParent, "TOP", 0, -120)
+  local x = IABD.settings.toastX or 0
+  local y = IABD.settings.toastY or -120
+  toast:SetPoint("CENTER", UIParent, "CENTER", x, y)
   toast:SetFrameStrata("DIALOG")
 
   -- Dark backdrop
@@ -172,8 +174,110 @@ function UI:CreateToast()
   self.toast = toast
 end
 
+-- Apply saved position to toast
+function UI:UpdateToastPosition()
+  if not self.toast then return end
+  local x = IABD.settings.toastX or 0
+  local y = IABD.settings.toastY or -120
+  self.toast:ClearAllPoints()
+  self.toast:SetPoint("CENTER", UIParent, "CENTER", x, y)
+end
+
+-- ============================================================
+-- Draggable Anchor (shown when settings panel is open)
+-- ============================================================
+
+function UI:CreateAnchor()
+  if self.anchor then return end
+
+  local anchor = CreateFrame("Frame", "ImABigDealAnchor", UIParent)
+  anchor:SetSize(200, 30)
+  local x = IABD.settings.toastX or 0
+  local y = IABD.settings.toastY or -120
+  anchor:SetPoint("CENTER", UIParent, "CENTER", x, y)
+  anchor:SetFrameStrata("TOOLTIP")
+  anchor:EnableMouse(true)
+  anchor:SetMovable(true)
+  anchor:RegisterForDrag("LeftButton")
+  anchor:SetClampedToScreen(true)
+
+  -- Background
+  local bg = anchor:CreateTexture(nil, "BACKGROUND")
+  bg:SetAllPoints()
+  bg:SetColorTexture(1, 0.5, 0, 0.4)
+
+  -- Border
+  local borderT = anchor:CreateTexture(nil, "BORDER")
+  borderT:SetPoint("TOPLEFT", -1, 1)
+  borderT:SetPoint("TOPRIGHT", 1, 1)
+  borderT:SetHeight(2)
+  borderT:SetColorTexture(1, 0.5, 0, 0.8)
+
+  local borderB = anchor:CreateTexture(nil, "BORDER")
+  borderB:SetPoint("BOTTOMLEFT", -1, -1)
+  borderB:SetPoint("BOTTOMRIGHT", 1, -1)
+  borderB:SetHeight(2)
+  borderB:SetColorTexture(1, 0.5, 0, 0.8)
+
+  local borderL = anchor:CreateTexture(nil, "BORDER")
+  borderL:SetPoint("TOPLEFT", -1, 1)
+  borderL:SetPoint("BOTTOMLEFT", -1, -1)
+  borderL:SetWidth(2)
+  borderL:SetColorTexture(1, 0.5, 0, 0.8)
+
+  local borderR = anchor:CreateTexture(nil, "BORDER")
+  borderR:SetPoint("TOPRIGHT", 1, 1)
+  borderR:SetPoint("BOTTOMRIGHT", 1, -1)
+  borderR:SetWidth(2)
+  borderR:SetColorTexture(1, 0.5, 0, 0.8)
+
+  -- Label
+  local label = anchor:CreateFontString(nil, "OVERLAY")
+  label:SetPoint("CENTER")
+  label:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+  label:SetText("Drag to position lore popup")
+  label:SetTextColor(1, 1, 1)
+
+  anchor:SetScript("OnDragStart", function(self)
+    self:StartMoving()
+  end)
+
+  anchor:SetScript("OnDragStop", function(self)
+    self:StopMovingOrSizing()
+    -- Save position relative to UIParent center
+    local cx, cy = self:GetCenter()
+    local ux, uy = UIParent:GetCenter()
+    IABD.settings.toastX = cx - ux
+    IABD.settings.toastY = cy - uy
+    IABD:SaveSettings()
+    -- Update toast position to match
+    UI:UpdateToastPosition()
+  end)
+
+  anchor:Hide()
+  self.anchor = anchor
+end
+
+function UI:ShowAnchor()
+  if not self.anchor then self:CreateAnchor() end
+  self.anchor:ClearAllPoints()
+  local x = IABD.settings.toastX or 0
+  local y = IABD.settings.toastY or -120
+  self.anchor:SetPoint("CENTER", UIParent, "CENTER", x, y)
+  self.anchor:Show()
+end
+
+function UI:HideAnchor()
+  if self.anchor then
+    self.anchor:Hide()
+  end
+end
+
 function UI:ShowToast(name, tier, title, lore, duration)
   if not self.toast then self:CreateToast() end
+
+  -- Always apply saved position
+  self:UpdateToastPosition()
 
   local color = IABD.tierColors[tier] or { 1, 1, 1 }
   local tierName = IABD.tierNames[tier] or "Unknown"

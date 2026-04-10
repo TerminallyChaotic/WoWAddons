@@ -108,8 +108,10 @@ function IABD:TogglePanel()
   end
   if self.settingsPanel:IsShown() then
     self.settingsPanel:Hide()
+    self.ui:HideAnchor()
   else
     self.settingsPanel:Show()
+    self.ui:ShowAnchor()
   end
 end
 

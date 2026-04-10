@@ -7,6 +7,8 @@ IABD.settings = {
   popupEnabled = true,
   popupDuration = 5,
   popupMode = "manual",    -- "manual" (close button), "timed" (auto-fade), "target" (dismiss on target change)
+  toastX = 0,              -- toast anchor position (relative to CENTER of UIParent)
+  toastY = -120,
   minTierDot = 1,        -- Minimum tier to show dot (1=Common+)
   minTierPopup = 2,      -- Minimum tier to show popup (2=Uncommon+)
   suppressInCombat = true,
@@ -173,6 +175,8 @@ function IABD:SaveSettings()
     popupEnabled = self.settings.popupEnabled,
     popupDuration = self.settings.popupDuration,
     popupMode = self.settings.popupMode,
+    toastX = self.settings.toastX,
+    toastY = self.settings.toastY,
     minTierDot = self.settings.minTierDot,
     minTierPopup = self.settings.minTierPopup,
     suppressInCombat = self.settings.suppressInCombat,
