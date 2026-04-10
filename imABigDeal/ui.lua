@@ -12,30 +12,34 @@ function UI:CreatePortraitDot()
   if self.dot then return end
 
   local dot = CreateFrame("Frame", "ImABigDealDot", UIParent)
-  dot:SetSize(22, 22)
+  dot:SetSize(24, 24)
   dot:SetFrameStrata("TOOLTIP")
   dot:SetFrameLevel(100)
 
-  -- Outer glow circle (larger, faded)
+  -- Outer glow (solid color, slightly larger, faded)
   local glow = dot:CreateTexture(nil, "BACKGROUND")
   glow:SetPoint("CENTER")
-  glow:SetSize(30, 30)
-  glow:SetTexture("Interface\\COMMON\\Indicator-Gray")
-  glow:SetAlpha(0.4)
+  glow:SetSize(32, 32)
+  glow:SetColorTexture(1, 1, 1, 0.3)
   dot.glow = glow
 
-  -- Main colored circle — try multiple round textures for 12.0 compat
+  -- Main dot (solid colored square — reliable in all WoW versions)
   local tex = dot:CreateTexture(nil, "ARTWORK")
   tex:SetAllPoints()
-  -- Use raid target icon circle (always available, vertex-colorable)
-  tex:SetTexture("Interface\\COMMON\\Indicator-Yellow")
+  tex:SetColorTexture(1, 1, 1, 1)
   dot.texture = tex
+
+  -- Inner border to give it depth
+  local border = dot:CreateTexture(nil, "OVERLAY")
+  border:SetPoint("TOPLEFT", 2, -2)
+  border:SetPoint("BOTTOMRIGHT", -2, 2)
+  border:SetColorTexture(0, 0, 0, 0.5)
+  dot.innerBorder = border
 
   -- Tier letter overlay (L, E, R, U, C)
   local letter = dot:CreateFontString(nil, "OVERLAY")
   letter:SetPoint("CENTER", 0, 0)
-  letter:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE, THICKOUTLINE")
-  letter:SetTextColor(0, 0, 0)
+  letter:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE, THICKOUTLINE")
   dot.letter = letter
 
   dot:Hide()
@@ -55,29 +59,38 @@ function UI:ShowDot(tier)
 
   self.dot:ClearAllPoints()
 
-  -- Try to anchor to the target frame (12.0 might use different names)
+  -- Find and anchor to the target frame
   local anchored = false
-  local framesToTry = { "TargetFrame", "TargetUnitFrame" }
-  for _, fname in ipairs(framesToTry) do
-    local f = _G[fname]
-    if f and f.IsShown then
-      local ok = pcall(function()
-        self.dot:SetPoint("TOPRIGHT", f, "TOPRIGHT", 4, 4)
-      end)
-      if ok then
-        anchored = true
-        break
-      end
-    end
+  local targetFrame = _G["TargetFrame"]
+
+  if targetFrame then
+    -- Try to anchor near the portrait (top-left area of the target frame)
+    -- TargetFrame's portrait is roughly at the left side
+    local ok = pcall(function()
+      self.dot:SetPoint("TOPLEFT", targetFrame, "TOPLEFT", 6, -6)
+    end)
+    if ok then anchored = true end
   end
 
-  -- Fallback: fixed position where target portrait usually sits
   if not anchored then
-    self.dot:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 280, -16)
+    -- Fallback: fixed position where target frame usually sits
+    self.dot:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 280, -30)
   end
 
-  self.dot.texture:SetVertexColor(color[1], color[2], color[3], 1)
-  self.dot.glow:SetVertexColor(color[1], color[2], color[3], 0.35)
+  -- Color the dot with tier color (using SetColorTexture — always works)
+  self.dot.texture:SetColorTexture(color[1], color[2], color[3], 1)
+  self.dot.glow:SetColorTexture(color[1], color[2], color[3], 0.3)
+
+  -- Inner border stays dark for contrast
+  self.dot.innerBorder:SetColorTexture(0, 0, 0, 0.4)
+
+  -- Letter in contrasting color (dark on bright, white on dark)
+  local brightness = color[1] * 0.3 + color[2] * 0.6 + color[3] * 0.1
+  if brightness > 0.5 then
+    self.dot.letter:SetTextColor(0, 0, 0)
+  else
+    self.dot.letter:SetTextColor(1, 1, 1)
+  end
   self.dot.letter:SetText(tierLetters[tier] or "?")
   self.dot:Show()
 end
