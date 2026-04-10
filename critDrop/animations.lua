@@ -95,7 +95,7 @@ function Anim:CreatePopupFrame(damageAmount, targetName)
   local damageStr = tostring(damageAmount)
 
   local digitWidth = 40
-  local spacing = 5
+  local spacing = CP.settings.digitSpacing or 5
   local totalWidth = (#damageStr * digitWidth) + ((#damageStr - 1) * spacing)
 
   local parentFrame = CreateFrame("Frame", nil, UIParent)

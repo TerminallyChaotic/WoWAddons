@@ -93,25 +93,31 @@ function Det:OnDamageDetected(amount, action, indicator, unitTarget)
   end
 
   -- DoT detection: track repeated identical damage on same target
-  -- Same (target, amount) hitting 2+ times within 4s = DoT tick
+  -- Same (target, amount) hitting 2+ times within 6s = DoT tick
+  -- Once flagged as DoT, stays flagged until combat ends
   if abilityType == "ability" then
     local guid = UnitGUID(unitTarget) or unitTarget
     local dotKey = guid .. ":" .. amount
     local now = GetTime()
 
     if not self.recentHits[dotKey] then
-      self.recentHits[dotKey] = { count = 1, firstSeen = now }
+      self.recentHits[dotKey] = { count = 1, firstSeen = now, isDot = false }
     else
       local entry = self.recentHits[dotKey]
-      if (now - entry.firstSeen) < 4 then
+      if entry.isDot then
+        -- Already identified as a DoT — all future ticks are DoT
+        abilityType = "dot"
+      elseif (now - entry.firstSeen) < 6 then
         entry.count = entry.count + 1
         if entry.count >= 2 then
+          entry.isDot = true
           abilityType = "dot"
         end
       else
-        -- Reset if too old
+        -- Too old, reset
         entry.count = 1
         entry.firstSeen = now
+        entry.isDot = false
       end
     end
 
@@ -119,7 +125,7 @@ function Det:OnDamageDetected(amount, action, indicator, unitTarget)
     if now - self.dotCleanupTimer > 10 then
       self.dotCleanupTimer = now
       for k, v in pairs(self.recentHits) do
-        if (now - v.firstSeen) > 6 then
+        if (now - v.firstSeen) > 15 then
           self.recentHits[k] = nil
         end
       end

@@ -23,18 +23,21 @@ CP.settings = {
   normalFontSize = 48,         -- font size for normal hits
   critFontSize = 72,           -- font size for crits
   animIntensity = 1.0,         -- multiplier for bounce/drift (0.5-2.0)
+  digitSpacing = 5,            -- pixels between digits
 }
 
 -- Crit sound options (id 0 = off)
+-- Sound options using numeric IDs (file paths unreliable in 12.0)
 CP.critSounds = {
-  { name = "Off",            file = nil },
-  { name = "Level Up",       file = "Sound\\Interface\\LevelUp.ogg" },
-  { name = "Raid Warning",   file = "Sound\\Interface\\RaidWarning.ogg" },
-  { name = "PvP Flag",       file = "Sound\\Interface\\PVPFlagTakenHorde.ogg" },
-  { name = "Quest Complete",  file = "Sound\\Interface\\iQuestComplete.ogg" },
-  { name = "Auction Open",   file = "Sound\\Interface\\AuctionWindowOpen.ogg" },
-  { name = "Map Ping",       file = "Sound\\Interface\\MapPing.ogg" },
-  { name = "Ready Check",    file = "Sound\\Interface\\ReadyCheck.ogg" },
+  { name = "Off",            soundID = nil },
+  { name = "Level Up",       soundID = 888 },
+  { name = "Raid Warning",   soundID = 8959 },
+  { name = "PvP Warning",    soundID = 8332 },
+  { name = "Quest Complete",  soundID = 618 },
+  { name = "Loot Coin",      soundID = 120 },
+  { name = "Map Ping",       soundID = 3175 },
+  { name = "Ready Check",    soundID = 8960 },
+  { name = "Bonk",           soundID = 3338 },
 }
 
 -- Runtime state
@@ -84,7 +87,42 @@ function CP:PositionPopup(frame, unitId)
   end
 end
 
--- Position above enemy's nameplate/head
+-- Position popup using GUID (not unit token, which can get recycled)
+function CP:PositionPopupByGUID(frame, guid)
+  if not guid then
+    self:PositionCenter(frame)
+    return
+  end
+
+  frame:ClearAllPoints()
+
+  -- Find the nameplate matching this GUID
+  if C_NamePlate and C_NamePlate.GetNamePlates then
+    local nameplates = C_NamePlate.GetNamePlates(false)
+    if nameplates then
+      for _, nameplate in ipairs(nameplates) do
+        if nameplate:IsShown() then
+          local npGUID = nil
+          if nameplate.UnitFrame and nameplate.UnitFrame.unit then
+            npGUID = UnitGUID(nameplate.UnitFrame.unit)
+          elseif nameplate.unitToken then
+            npGUID = UnitGUID(nameplate.unitToken)
+          end
+
+          if npGUID == guid then
+            frame:SetPoint("BOTTOM", nameplate, "TOP", 0, self.settings.nameplateOffset)
+            return
+          end
+        end
+      end
+    end
+  end
+
+  -- No nameplate found (dead, despawned, out of range) — center fallback
+  self:PositionCenter(frame)
+end
+
+-- Position above enemy's nameplate/head (legacy, used by PositionPopup)
 function CP:PositionAboveHead(frame, unitId)
   unitId = unitId or "target"
 
@@ -170,13 +208,17 @@ function CP:OnDamageDetected(damageAmount, abilityType, indicator, unitTarget, s
   if indicator == "CRITICAL" then
     local soundIdx = self.settings.critSoundId or 1
     local soundEntry = self.critSounds[soundIdx + 1]  -- 0-indexed setting, 1-indexed table
-    if soundEntry and soundEntry.file then
-      PlaySoundFile(soundEntry.file, "SFX")
+    if soundEntry and soundEntry.soundID then
+      PlaySound(soundEntry.soundID, "SFX")
     end
   end
 
+  -- Capture GUID NOW before the unit token gets recycled
+  local targetGUID = UnitGUID(unitTarget or "target")
+
   -- Create popup
   local frame = self.animations:CreatePopupFrame(damageAmount, unitTarget or "target")
+  frame.targetGUID = targetGUID  -- store for nameplate matching
 
   -- Color and size based on damage type
   if indicator == "CRITICAL" then
@@ -187,8 +229,8 @@ function CP:OnDamageDetected(damageAmount, abilityType, indicator, unitTarget, s
     frame.isCrit = false
   end
 
-  -- Position based on settings (default: above the damaged unit's head)
-  self:PositionPopup(frame, unitTarget or "target")
+  -- Position based on settings — pass GUID for reliable nameplate matching
+  self:PositionPopupByGUID(frame, targetGUID)
 
   frame:Show()
 

@@ -69,7 +69,7 @@ function Config:CreatePanel()
   if CP.settingsPanel then return end
 
   local panel = CreateFrame("Frame", "CritPopupPanel", UIParent)
-  panel:SetSize(400, 740)
+  panel:SetSize(400, 790)
   panel:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
   panel:SetFrameStrata("DIALOG")
   panel:EnableMouse(true)
@@ -136,6 +136,7 @@ function Config:CreatePanel()
 
   _, y = CreateSlider(panel, y, "Normal Damage Size", 24, 96, 2, "normalFontSize", "%.0f")
   _, y = CreateSlider(panel, y, "Crit Damage Size", 36, 120, 2, "critFontSize", "%.0f")
+  _, y = CreateSlider(panel, y, "Digit Spacing (px)", 0, 30, 1, "digitSpacing", "%.0f")
   _, y = CreateSlider(panel, y, "Drop Height (px)", 20, 150, 5, "startHeight", "%.0f")
   _, y = CreateSlider(panel, y, "Animation Intensity", 0.3, 2.5, 0.1, "animIntensity", "%.1fx")
   _, y = CreateSlider(panel, y, "Display Duration (sec)", 0.5, 3.0, 0.1, "durationSeconds", "%.1fs")
@@ -278,8 +279,8 @@ function Config:CreatePanel()
   previewBtn:SetScript("OnClick", function()
     local idx = CP.settings.critSoundId or 1
     local entry = CP.critSounds[idx + 1]
-    if entry and entry.file then
-      PlaySoundFile(entry.file, "SFX")
+    if entry and entry.soundID then
+      PlaySound(entry.soundID, "SFX")
     end
   end)
   previewBtn:SetScript("OnEnter", function() previewTxt:SetTextColor(1, 0.82, 0) end)
@@ -376,6 +377,7 @@ function Config:SaveSettings()
     normalFontSize = CP.settings.normalFontSize,
     critFontSize = CP.settings.critFontSize,
     animIntensity = CP.settings.animIntensity,
+    digitSpacing = CP.settings.digitSpacing,
   }
 end
 
@@ -404,6 +406,7 @@ function Config:LoadSettings()
     CP.settings.normalFontSize = saved.normalFontSize or CP.settings.normalFontSize
     CP.settings.critFontSize = saved.critFontSize or CP.settings.critFontSize
     CP.settings.animIntensity = saved.animIntensity or CP.settings.animIntensity
+    CP.settings.digitSpacing = saved.digitSpacing or CP.settings.digitSpacing
   end
 end
 
